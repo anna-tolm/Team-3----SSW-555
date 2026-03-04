@@ -2,7 +2,7 @@ import { Router } from 'express';
 const router = Router();
 import { goalData } from '../data/index.js';
 import { helperMethods } from '../helpers.js';
-import { generatePlanForGoal } from '../services/ai/planService.js';
+import { generatePlanForGoal } from '../planService.js';
 
 // POST /goals - create goal (body: userId, type, target?, description?, plan?)
 router.route('/').post(async (req, res) => {
