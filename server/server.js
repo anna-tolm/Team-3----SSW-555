@@ -1,11 +1,17 @@
 import express from 'express';
 import path from 'path';
+import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
+import healthCoachRoutes from './routes/healthCoach.js';
+dotenv.config();
 const app = express();
+
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/api/health-coach', healthCoachRoutes);
 //import constructorMethod from './routes/index.js';
 
 //app.use(express.json());
