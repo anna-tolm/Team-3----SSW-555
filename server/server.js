@@ -7,14 +7,14 @@ dotenv.config();
 const app = express();
 
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+app.use(express.json()); //uncommented and moved
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/health-coach', healthCoachRoutes);
 //import constructorMethod from './routes/index.js';
 
-//app.use(express.json());
+
 //constructorMethod(app);
 app.listen(3000, () => {
   console.log("We've now got a server!");
