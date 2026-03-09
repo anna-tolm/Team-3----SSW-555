@@ -1,0 +1,50 @@
+#chatWindow{
+    height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+#titleType{
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 15px
+}
+.input{
+    display: flex;
+    width: 100%
+
+}
+.input textarea{
+    flex: 1;
+    padding: 8px;
+    border-radius: 15px;
+
+}
+.input button{
+    padding: 10px 30px;
+    cursor: pointer;
+    border-radius: 15px;
+}
+
+.message.user{ text-align: right; }
+.message.ai{ text-align: left; }
+
+.message.user .label{
+    padding-right: 10px
+}
+.message.ai .label{
+    padding-left: 10px
+}
+
+.bubble {
+    display: inline-block;
+    padding: 8px 12px;
+    margin: 4px 0;
+    border-radius: 8px;
+    max-width: 70%;
+}
+
+.message.user .bubble{ background-color:black;
+color: white}
+.message.ai .bubble{ background-color:  rgb(210, 204, 204)}

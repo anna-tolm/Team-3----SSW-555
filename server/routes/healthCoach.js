@@ -2,7 +2,7 @@ import express from "express";
 import { getHealthCoachResponse } from '../services/gemini/healthCoach.js';
 const router = express.Router();
 
-
+//POST for routing messages in chat to AI
 router.post('/chat', async (req, res) => {
     const { message, userId } = req.body;
     if(!message){

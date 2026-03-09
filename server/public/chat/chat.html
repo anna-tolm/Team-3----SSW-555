@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang = "en">
+    <head>
+        <title>Health Coach Chat</title>
+        <link rel="stylesheet" href="chat.css" />
+    </head>
+    <body>
+        <div class="title" id="titleType">
+            <h1>Your Health Coach</h1>
+        </div>
+ <!-- where messages appear -->
+    <div class="chat-window" id="chatWindow">
+
+      <!-- TEMPORARY: fake messages for testing styles, delete when done!!! -->
+      <div class="message user">
+        <div class="label">You</div>
+        <div class="bubble">What should I eat for breakfast?</div>
+      </div>
+      <div class="message ai">
+        <div class="label">Coach</div>
+        <div class="bubble">Try greek yogurt with berries!</div>
+      </div>
+      <!-- END TEMP -->
+
+    </div>
+
+    <!-- user input area -->
+    <div class="input">
+      <textarea id="messageInput" placeholder="Ask your health coach..."></textarea>
+      <button id="sendBtn" onclick="sendMessage()">Send</button>
+    </div>
+
+    <script src="chatScript.js"></script>
+  </body>
+</html>
