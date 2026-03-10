@@ -16,21 +16,26 @@ router.route('/').get(async (req, res) => {
 // POST /users/register - create account
 router.route('/register').post(async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, confirmPassword } = req.body;
+    if (password !== confirmPassword) {
+      return res.status(400).json({ error: 'Passwords do not match' });
+    }
     const user = await userData.createUser(name, email, password);
-    res.status(201).json(user);
+    res.status(201).redirect('/login.html');
   } catch (e) {
     res.status(400).json({ error: e?.message ?? e });
   }
 });
 
-// POST /users/login - verify credentials, return profile
+// POST /users/login - verify credentials, then redirect to profile page
 router.route('/login').post(async (req, res) => {
   try {
     const { email, password } = req.body;
     const profile = await userData.loginUser(email, password);
-    res.json(profile);
+    // Redirect to static profile page with the user id in the query string
+    return res.redirect(`/profile.html?id=${encodeURIComponent(profile._id)}`);
   } catch (e) {
+    // For now, on error just send JSON; you can swap to an HTML error page later.
     res.status(401).json({ error: e?.message ?? e });
   }
 });

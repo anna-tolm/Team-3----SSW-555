@@ -9,8 +9,16 @@ const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.use(express.json()); //uncommented and moved
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // parse form POSTs (signup/login)
+
+// Landing/dashboard page at http://localhost:3000
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
+
 app.use('/api/health-coach', healthCoachRoutes);
 import constructorMethod from './routes/index.js';
 
