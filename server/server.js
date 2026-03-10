@@ -12,10 +12,10 @@ const __dirname = path.dirname(__filename);
 app.use(express.json()); //uncommented and moved
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/health-coach', healthCoachRoutes);
-//import constructorMethod from './routes/index.js';
+import constructorMethod from './routes/index.js';
 
 
-//constructorMethod(app);
+constructorMethod(app);
 app.listen(3000, () => {
   console.log("We've now got a server!");
   console.log('Your routes will be running on http://localhost:3000');
