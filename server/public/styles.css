@@ -76,7 +76,7 @@ ul {
   padding-left: 18px;
 }
 
-button {
+/* button {
   padding: 10px 12px;
   border: 2px solid #121316;
   background: #bdb8b8;
@@ -93,10 +93,39 @@ button {
 button:hover{
   transform: translateY(2px);
   opacity: 0.85;
+} */
+
+button {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  border: 2px solid var(--outline);
+  background: transparent;
+  color: var(--outline);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: bold;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+      }
+button:hover {
+  background: var(--outline);
+  color: #ededf3;
+  transform: translateY(-1px);
 }
 
 button.secondary {
   background: #1d1b1b;
-  color:rgb(205, 198, 198);
-  border: 1px solid rgb(205, 198, 198);
+  color: #ededf3;
+  border: 1px solid  #1d1b1b;
+  transition: all 0.2s ease
+}
+
+button.secondary:hover {
+  background: #ededf3;;
+  color:#1d1b1b;
+  transform: translateY(-1px);
+  border: 2px solid var(--outline)
 }
