@@ -13,9 +13,6 @@
     });
 
     function addMessage(text, role) {
-      if (emptyState){
-        emptyState.remove(); //removes placeholder (Ask me anything)
-    }
 
       const wrapper = document.createElement('div'); //new div for messages
       wrapper.className = `message ${role}`; //ai or user

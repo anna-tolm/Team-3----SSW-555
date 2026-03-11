@@ -6,96 +6,173 @@
     <title>User Profile</title>
     <link rel="stylesheet" href="/styles.css" />
     <style>
-      body {
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: #0f172a;
-        color: #e5e7eb;
-        margin: 0;
-      }
+      /* ── Profile-specific styles ── */
       main {
-        max-width: 800px;
-        margin: 2rem auto;
-        padding: 1.5rem;
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 40px 10px 40px 10px;
       }
-      .card {
-        background: rgba(15, 23, 42, 0.9);
-        border-radius: 0.75rem;
-        padding: 1.5rem;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-      }
-      h1 {
-        font-size: 1.75rem;
-        margin-bottom: 0.75rem;
-      }
-      .muted {
-        color: #9ca3af;
-        font-size: 0.9rem;
-      }
-      .field {
-        margin: 0.25rem 0;
-      }
-      .field strong {
-        display: inline-block;
-        min-width: 120px;
-      }
-      .biometrics-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 0.5rem 1rem;
-        margin-top: 0.75rem;
-      }
-      .pill {
-        display: inline-block;
-        padding: 0.25rem 0.6rem;
-        border-radius: 999px;
-        background: rgba(56, 189, 248, 0.1);
-        border: 1px solid rgba(56, 189, 248, 0.3);
-        font-size: 0.75rem;
-      }
-      .error {
-        color: #fecaca;
-        margin-top: 0.5rem;
-        font-size: 0.9rem;
-      }
+
       .back-btn {
         display: inline-block;
-        margin-bottom: 1rem;
-        padding: 0.4rem 0.9rem;
+        margin-bottom: 1.5rem;
+        padding: 0.4rem 1rem;
         border-radius: 999px;
-        border: 1px solid rgba(148, 163, 184, 0.5);
+        border: 2px solid var(--outline);
         background: transparent;
-        color: #94a3b8;
+        color: var(--outline);
         cursor: pointer;
-        font-size: 0.9rem;
+        font-size: 0.82rem;
+        font-weight: bold;
         text-decoration: none;
+        transition: all 0.2s ease;
+        font-family: inherit;
       }
+
       .back-btn:hover {
-        background: rgba(148, 163, 184, 0.15);
-        color: #e5e7eb;
+        background: var(--outline);
+        color: #ededf3;
+        transform: translateY(-1px);
+      }
+
+      /* Page title row */
+      .profile-header {
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .profile-header h1 {
+        font-size: 3rem;
+        margin: 0;
+      }
+
+      .profile-email {
+        font-size: 0.875rem;
+        color: #555;
+        margin: 0.3rem 0 0 0;
+      }
+
+      .full-divider {
+        border: none;
+        border-top: 2px solid var(--outline);
+        margin: 1rem 0 1.5rem 0;
+      }
+
+      /* Info card */
+      .card {
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        border: 2px solid var(--outline);
+        margin-bottom: 1.25rem;
+      }
+
+      .card h2 {
+        font-size: 1.5rem;
+        margin: -1rem -1.5rem 1rem -1.5rem;
+        padding: 0.75rem 1.5rem 0.75rem 1.5rem;
+        border-bottom: 2px solid var(--outline);
+        border-radius: 0.62rem 0.62rem 0 0;
+      }
+
+      .field {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        margin: 0.5rem 0;
+        font-size: 0.9rem;
+      }
+
+      .field strong {
+        min-width: 90px;
+        font-weight: 600;
+        color: var(--outline);
+        opacity: 0.6;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .field span {
+        color: var(--outline);
+        font-weight: 500;
+      }
+
+      /* Biometrics grid */
+      .biometrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+      }
+
+      .bio-item {
+        border: 1.5px solid var(--outline);
+        border-radius: 0.6rem;
+        padding: 0.65rem 0.9rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+      }
+
+      .bio-item strong {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        opacity: 0.5;
+        font-weight: 600;
+      }
+
+      .bio-item span {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .muted {
+        font-size: 0.85rem;
+        color: #777;
+        margin-top: 0.25rem;
+      }
+
+      .error {
+        color: #b91c1c;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+        padding: 0.75rem 1rem;
+        border: 1.5px solid #b91c1c;
+        border-radius: 0.5rem;
+        display: none;
+      }
+
+      .error:not(:empty) {
+        display: block;
       }
     </style>
   </head>
   <body>
     <main>
+      <a href="/" class="back-btn">← Back to main</a>
+
+      <div id="error" class="error" aria-live="polite"></div>
+
+      <div class="profile-header">
+        <h1 id="nameHeading">User Profile</h1>
+        <p class="profile-email" id="emailLine"></p>
+      </div>
+
+      <hr class="full-divider" />
+
       <div class="card">
-        <a href="/" class="back-btn">← Back to main</a>
-        <div id="error" class="error" aria-live="polite"></div>
-
-        <h1 id="nameHeading">User profile</h1>
-        <div class="muted" id="emailLine"></div>
-
-        <div id="bioSection" style="margin-top: 1rem;">
-          <div class="field">
-            <strong>Joined:</strong> <span id="joined"></span>
-          </div>
+        <h2>Account Info</h2>
+        <div class="field">
+          <strong>Joined</strong>
+          <span id="joined">—</span>
         </div>
+      </div>
 
-        <section style="margin-top: 1.25rem;">
-          <h2 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Biometrics</h2>
-          <div class="muted" id="bioEmptyNote">No biometrics saved yet.</div>
-          <div class="biometrics-grid" id="biometricsGrid"></div>
-        </section>
+      <div class="card" id="bioCard">
+        <h2>Biometrics</h2>
+        <p class="muted" id="bioEmptyNote">No biometrics saved yet.</p>
+        <div class="biometrics-grid" id="biometricsGrid"></div>
       </div>
     </main>
 
