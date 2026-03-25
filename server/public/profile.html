@@ -13,9 +13,21 @@
         padding: 40px 10px 40px 10px;
       }
 
-      .back-btn {
-        display: inline-block;
+      .profile-nav {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem 0.65rem;
         margin-bottom: 1.5rem;
+        padding: 0.65rem 0.85rem;
+        border-radius: 0.75rem;
+        border: 2px solid var(--outline);
+        background: rgba(255, 255, 255, 0.35);
+      }
+
+      .profile-nav .nav-pill {
+        display: inline-block;
+        margin: 0;
         padding: 0.4rem 1rem;
         border-radius: 999px;
         border: 2px solid var(--outline);
@@ -27,12 +39,30 @@
         text-decoration: none;
         transition: all 0.2s ease;
         font-family: inherit;
+        box-sizing: border-box;
       }
 
-      .back-btn:hover {
+      .profile-nav .nav-pill:hover {
         background: var(--outline);
         color: #ededf3;
         transform: translateY(-1px);
+      }
+
+      .profile-nav .nav-pill.secondary {
+        background: #1d1b1b;
+        color: #ededf3;
+      }
+
+      .profile-nav .nav-pill.secondary:hover {
+        opacity: 0.92;
+        transform: translateY(-1px);
+      }
+
+      .profile-nav .nav-pill:disabled,
+      .profile-nav .nav-pill[aria-disabled='true'] {
+        opacity: 0.45;
+        pointer-events: none;
+        cursor: not-allowed;
       }
 
       /* Page title row */
@@ -150,7 +180,14 @@
   </head>
   <body>
     <main>
-      <a href="/" class="back-btn">← Back to main</a>
+      <nav class="profile-nav" aria-label="Profile navigation">
+        <a href="/" class="nav-pill">Sign Out</a>
+        <button type="button" class="nav-pill" onclick="alert('AI Coach creates a plan for achieving a user given goal in specific json format, and saves it to profile and goals database.')">Create Goal</button>
+        <!-- We should have this "Create Goal" button instead of a "Generate Workout" button, so the "Talk to AI Agent" button fields general questions,
+        meanwhile the "Create Goal" button can take in a specific user goal, output the necessary workout or diet plan, and save it to profile and DB -->
+        <a href="/chat/chat.html" class="nav-pill secondary" id="chatSelfLink">Talk to AI Agent</a>
+        <a href="/profile.html" class="nav-pill secondary" id="profileSelfLink">View Profile</a>
+      </nav>
 
       <div id="error" class="error" aria-live="polite"></div>
 
@@ -177,6 +214,44 @@
     </main>
 
     <script>
+      var PROFILE_USER_ID_KEY = 'healthCoachProfileUserId';
+
+      function resolveProfileUserId() {
+        var params = new URLSearchParams(window.location.search);
+        var fromQuery = params.get('id');
+        if (fromQuery) {
+          try {
+            sessionStorage.setItem(PROFILE_USER_ID_KEY, fromQuery);
+          } catch (e) {}
+          return fromQuery;
+        }
+        try {
+          return sessionStorage.getItem(PROFILE_USER_ID_KEY);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function wireNavLinks(userId) {
+        var profileLink = document.getElementById('profileSelfLink');
+        var chatLink = document.getElementById('chatFromProfileLink');
+        if (userId) {
+          profileLink.href = '/profile.html?id=' + encodeURIComponent(userId);
+          profileLink.hidden = false;
+          profileLink.removeAttribute('aria-disabled');
+          if (chatLink) {
+            chatLink.href = '/chat/chat.html?userId=' + encodeURIComponent(userId);
+          }
+        } else {
+          profileLink.removeAttribute('href');
+          profileLink.hidden = true;
+          profileLink.setAttribute('aria-disabled', 'true');
+          if (chatLink) {
+            chatLink.href = '/chat/chat.html';
+          }
+        }
+      }
+
       async function fetchUser(id) {
         const res = await fetch('/users/' + encodeURIComponent(id));
         if (!res.ok) {
@@ -232,19 +307,19 @@
         }
       }
 
-      // If ?id=<userId> is present, load that profile.
+      // Load profile from ?id= or from session (after login we store id on first visit).
       (function init() {
-        const params = new URLSearchParams(window.location.search);
-        const idFromQuery = params.get('id');
-        if (idFromQuery) {
-          fetchUser(idFromQuery)
+        var userId = resolveProfileUserId();
+        wireNavLinks(userId);
+        if (userId) {
+          fetchUser(userId)
             .then(renderProfile)
-            .catch((err) => {
-              const errorEl = document.getElementById('error');
+            .catch(function (err) {
+              var errorEl = document.getElementById('error');
               errorEl.textContent = 'Could not load user: ' + err.message;
             });
         } else {
-          const errorEl = document.getElementById('error');
+          var errorEl = document.getElementById('error');
           errorEl.textContent = 'No user specified. Please log in first.';
         }
       })();
