@@ -1,5 +1,4 @@
 //establishes connection to gemini
-
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { aiConfig } from "../../config/aiSettings.js";
 //for testing: 
