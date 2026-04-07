@@ -1,4 +1,4 @@
-export const helperMethods = {
+const helperMethods = {
   checkString(str, varName) {
     if (!str) throw `${varName} is not provided`;
     if (typeof str !== 'string') throw `${varName} is not a string`;
@@ -45,3 +45,5 @@ export const helperMethods = {
     return d.toISOString().split('T')[0];
   }
 };
+
+export default helperMethods;

@@ -5,22 +5,24 @@
 // Use redirectIfLoggedIn on GET /login and GET /register.
 // Use requireAuth on routes that need a logged-in user (e.g. /dashboard, /signout).
 
-const middleware = {
-  /** If user is logged in, redirect to home. Use for /login and /register GET. */
-  redirectIfLoggedIn(req, res, next) {
-    if (req.session && req.session.user) {
-      return res.redirect('/');
-    }
-    next();
-  },
+export const requireAuth = (req, res, next) => {
+  const userId = req.cookies?.userId;
 
-  /** If no user in session, redirect to /login. Use for protected routes. */
-  requireAuth(req, res, next) {
-    if (!req.session || !req.session.user) {
-      return res.redirect('/login');
-    }
-    next();
+  if (!userId) {
+    return res.status(401).json({ error: 'Not authenticated' });
   }
+
+  req.authUserId = userId;
+  next();
 };
 
-export default middleware;
+export const requireMatchingUser = (req, res, next) => {
+  const routeId = req.params.id;
+  const authUserId = req.authUserId;
+
+  if (routeId !== authUserId) {
+    return res.status(403).json({ error: 'Not authorized to access this profile' });
+  }
+
+  next();
+};

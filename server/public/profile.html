@@ -297,6 +297,13 @@
     <script>
       var PROFILE_USER_ID_KEY = 'healthCoachProfileUserId';
 
+      function redirectToLogin() {
+        try {
+          sessionStorage.removeItem(PROFILE_USER_ID_KEY);
+        } catch (e) {}
+        window.location.href = '/login.html';
+      }
+
       function resolveProfileUserId() {
         var params = new URLSearchParams(window.location.search);
         var fromQuery = params.get('id');
@@ -315,11 +322,13 @@
 
       function wireNavLinks(userId) {
         var profileLink = document.getElementById('profileSelfLink');
-        var chatLink = document.getElementById('chatFromProfileLink');
+        var chatLink = document.getElementById('chatSelfLink'); // fixed id
+
         if (userId) {
           profileLink.href = '/profile.html?id=' + encodeURIComponent(userId);
           profileLink.hidden = false;
           profileLink.removeAttribute('aria-disabled');
+
           if (chatLink) {
             chatLink.href = '/chat/chat.html?userId=' + encodeURIComponent(userId);
           }
@@ -327,6 +336,7 @@
           profileLink.removeAttribute('href');
           profileLink.hidden = true;
           profileLink.setAttribute('aria-disabled', 'true');
+
           if (chatLink) {
             chatLink.href = '/chat/chat.html';
           }
@@ -360,18 +370,33 @@
       }
 
       async function fetchUser(id) {
-        const res = await fetch('/users/' + encodeURIComponent(id));
+        const res = await fetch('/users/' + encodeURIComponent(id), {
+          credentials: 'same-origin'
+        });
+
+        if (res.status === 401 || res.status === 403) {
+          redirectToLogin();
+          throw new Error('Unauthorized');
+        }
+
+        const contentType = res.headers.get('content-type') || '';
+
         if (!res.ok) {
           const text = await res.text();
           throw new Error(text || 'Request failed with ' + res.status);
         }
+
+        if (!contentType.includes('application/json')) {
+          redirectToLogin();
+          throw new Error('Expected JSON response but received something else.');
+        }
+
         return res.json();
       }
 
       function renderProfile(user) {
         currentUserId = user?._id ? user._id : currentUserId;
 
-        // Keep the edit form hidden until the user explicitly clicks "Edit biometrics".
         hideBioForm();
 
         const nameHeading = document.getElementById('nameHeading');
@@ -515,23 +540,33 @@
 
         try {
           setBioSaveStatus('Saving...', false);
+
           const res = await fetch('/users/' + encodeURIComponent(userId) + '/biometrics', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
             body: JSON.stringify(next)
           });
+
+          if (res.status === 401 || res.status === 403) {
+            redirectToLogin();
+            return;
+          }
+
           const text = await res.text();
           if (!res.ok) {
             throw new Error(text || `Save failed with status ${res.status}`);
           }
-          // Refresh and re-render from server response/user.
+
           const refreshed = await fetchUser(userId);
           window.__lastUserBiometrics = refreshed?.biometrics || null;
           renderProfile(refreshed);
           setBioSaveStatus('Saved biometrics successfully.', false);
           hideBioForm();
         } catch (err) {
-          setBioSaveStatus('Save failed: ' + err.message, true);
+          if (err.message !== 'Unauthorized') {
+            setBioSaveStatus('Save failed: ' + err.message, true);
+          }
         }
       }
 
@@ -539,35 +574,42 @@
         const id = document.getElementById('userIdInput').value.trim();
         const errorEl = document.getElementById('error');
         errorEl.textContent = '';
+
         if (!id) {
           errorEl.textContent = 'Please enter a user id.';
           return;
         }
+
         try {
           currentUserId = id;
           const user = await fetchUser(id);
           window.__lastUserBiometrics = user?.biometrics || null;
           renderProfile(user);
         } catch (err) {
-          errorEl.textContent = 'Could not load user: ' + err.message;
+          if (err.message !== 'Unauthorized') {
+            errorEl.textContent = 'Could not load user: ' + err.message;
+          }
         }
       }
 
-      // If ?id=<userId> is present, auto-load that profile.
       (function init() {
         var userId = resolveProfileUserId();
         wireNavLinks(userId);
+
         if (userId) {
           fetchUser(userId)
             .then(renderProfile)
             .catch(function (err) {
-              var errorEl = document.getElementById('error');
-              errorEl.textContent = 'Could not load user: ' + err.message;
+              if (err.message !== 'Unauthorized') {
+                var errorEl = document.getElementById('error');
+                errorEl.textContent = 'Could not load user: ' + err.message;
+              }
             });
         } else {
-          var errorEl = document.getElementById('error');
-          errorEl.textContent = 'No user specified. Please log in first.';
+          redirectToLogin();
+          return;
         }
+
         document.getElementById('saveBiometricsBtn').addEventListener('click', saveBiometrics);
         document.getElementById('editBiometricsBtn').addEventListener('click', () => {
           if (!currentUserId) {
@@ -577,6 +619,7 @@
           }
           showBioForm();
         });
+
         hideBioForm();
       })();
     </script>

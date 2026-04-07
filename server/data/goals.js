@@ -1,6 +1,6 @@
 import { goals as goalsCollection } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
-import { helperMethods } from '../helpers.js';
+import helperMethods from '../helpers.js';
 import { getUserById } from './users.js';
 
 // GOAL SCHEMA
