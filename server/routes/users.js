@@ -1,7 +1,8 @@
 import { Router } from 'express';
 const router = Router();
 import { userData } from '../data/index.js';
-import { helperMethods } from '../helpers.js';
+import helperMethods from '../helpers.js';
+import { requireAuth, requireMatchingUser } from '../middleware.js'; 
 
 // GET /users - list all users (e.g. admin)
 router.route('/').get(async (req, res) => {
@@ -32,16 +33,20 @@ router.route('/login').post(async (req, res) => {
   try {
     const { email, password } = req.body;
     const profile = await userData.loginUser(email, password);
-    // Redirect to static profile page with the user id in the query string
+
+    res.cookie('userId', profile._id.toString(), {
+      httpOnly: true,
+      sameSite: 'lax'
+    });
+
     return res.redirect(`/profile.html?id=${encodeURIComponent(profile._id)}`);
   } catch (e) {
-    // For now, on error just send JSON; you can swap to an HTML error page later.
     res.status(401).json({ error: e?.message ?? e });
   }
 });
 
-// GET /users/:id - get user profile by id (no password)
-router.route('/:id').get(async (req, res) => {
+// GET /users/:id - get user profile by id
+router.route('/:id').get(requireAuth, requireMatchingUser, async (req, res) => {
   try {
     const id = helperMethods.checkId(req.params.id, 'id');
     const user = await userData.getUserById(id);
@@ -51,8 +56,8 @@ router.route('/:id').get(async (req, res) => {
   }
 });
 
-// PATCH /users/:id - update profile (e.g. name)
-router.route('/:id').patch(async (req, res) => {
+// PATCH /users/:id - update profile
+router.route('/:id').patch(requireAuth, requireMatchingUser, async (req, res) => {
   try {
     const id = helperMethods.checkId(req.params.id, 'id');
     const user = await userData.updateUser(id, req.body);
@@ -61,6 +66,41 @@ router.route('/:id').patch(async (req, res) => {
     res.status(400).json({ error: e?.message ?? e });
   }
 });
+
+// Old login without cookies/sessions
+// router.route('/login').post(async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     const profile = await userData.loginUser(email, password);
+//     // Redirect to static profile page with the user id in the query string
+//     return res.redirect(`/profile.html?id=${encodeURIComponent(profile._id)}`);
+//   } catch (e) {
+//     // For now, on error just send JSON; you can swap to an HTML error page later.
+//     res.status(401).json({ error: e?.message ?? e });
+//   }
+// });
+
+// // GET /users/:id - get user profile by id (no password)
+// router.route('/:id').get(async (req, res) => {
+//   try {
+//     const id = helperMethods.checkId(req.params.id, 'id');
+//     const user = await userData.getUserById(id);
+//     res.json(user);
+//   } catch (e) {
+//     res.status(400).json({ error: e?.message ?? e });
+//   }
+// });
+
+// // PATCH /users/:id - update profile (e.g. name)
+// router.route('/:id').patch(async (req, res) => {
+//   try {
+//     const id = helperMethods.checkId(req.params.id, 'id');
+//     const user = await userData.updateUser(id, req.body);
+//     res.json(user);
+//   } catch (e) {
+//     res.status(400).json({ error: e?.message ?? e });
+//   }
+// });
 
 // PUT /users/:id/biometrics - set/replace biometrics
 router.route('/:id/biometrics').put(async (req, res) => {
