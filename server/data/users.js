@@ -14,7 +14,7 @@ import helperMethods from '../helpers.js';
 //     mealLogs: MealLog[];                     // default []
 //     dateJoined: Date;                        // required
 //   };
-  
+
 // type Biometrics = {
 //     age: number;
 //     sex: "male" | "female" | "non-binary" | "other";

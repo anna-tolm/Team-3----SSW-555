@@ -1,8 +1,7 @@
 import { Router } from 'express';
 const router = Router();
 import { goalData } from '../data/index.js';
-import { helperMethods } from '../helpers.js';
-import { generatePlanForGoal } from '../services/ai/planService.js';
+import helperMethods from '../helpers.js';
 
 // POST /goals - create goal (body: userId, type, target?, description?, plan?)
 router.route('/').post(async (req, res) => {
@@ -47,18 +46,6 @@ router.route('/:id').patch(async (req, res) => {
     res.json(goal);
   } catch (e) {
     res.status(400).json({ error: e?.message ?? e });
-  }
-});
-
-// POST /goals/:id/plan/ai - generate plan via Gemini and save to goal
-router.route('/:id/plan/ai').post(async (req, res) => {
-  try {
-    const id = helperMethods.checkId(req.params.id, 'id');
-    const goal = await generatePlanForGoal(id);
-    res.json(goal);
-  } catch (e) {
-    const status = e?.message?.includes('not set') ? 503 : (e?.message?.includes('not found') ? 404 : 400);
-    res.status(status).json({ error: e?.message ?? e });
   }
 });
 

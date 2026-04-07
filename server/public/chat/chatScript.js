@@ -19,6 +19,7 @@ function resolveSignedInUserId() {
 function wireChatNav(userId) {
   const profileLink = document.getElementById('chatProfileLink');
   const selfLink = document.getElementById('chatSelfLink');
+  const createGoalLink = document.getElementById('createGoalLink');
   if (!profileLink) return;
   if (userId) {
     profileLink.href = '/profile.html?id=' + encodeURIComponent(userId);
@@ -26,11 +27,17 @@ function wireChatNav(userId) {
     if (selfLink) {
       selfLink.href = '/chat/chat.html?userId=' + encodeURIComponent(userId);
     }
+    if (createGoalLink) {
+      createGoalLink.href = '/create-goal.html?userId=' + encodeURIComponent(userId);
+    }
   } else {
     profileLink.removeAttribute('href');
     profileLink.hidden = true;
     if (selfLink) {
       selfLink.href = '/chat/chat.html';
+    }
+    if (createGoalLink) {
+      createGoalLink.href = '/create-goal.html';
     }
   }
 }
