@@ -176,13 +176,144 @@
       .error:not(:empty) {
         display: block;
       }
+      .section-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.3rem;
+      }
+      .form {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px dashed rgba(148, 163, 184, 0.35);
+      }
+      .form-row {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+      }
+      .form-row label {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        min-width: 170px;
+      }
+      .form-row input,
+      .form-row select,
+      .form-row textarea {
+        padding: 0.4rem 0.6rem;
+        border-radius: 0.4rem;
+        border: 1px solid #4b5563;
+        background: #020617;
+        color: #e5e7eb;
+      }
+      .form-row textarea {
+        min-height: 84px;
+        resize: vertical;
+      }
+      .save-btn {
+        margin-top: 0.9rem;
+        padding: 0.5rem 1.1rem;
+        border-radius: 999px;
+        border: none;
+        background: linear-gradient(135deg, #38bdf8, #4f46e5);
+        color: white;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .save-btn:hover {
+        opacity: 0.92;
+      }
+
+      .goals-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 0.5rem;
+      }
+      .goal-item {
+        border: 1.5px solid var(--outline);
+        border-radius: 0.65rem;
+        padding: 0.85rem 1rem;
+        background: rgba(255, 255, 255, 0.45);
+      }
+      .goal-item header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-bottom: 0.35rem;
+      }
+      .goal-item .goal-type {
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--outline);
+        text-transform: capitalize;
+      }
+      .goal-item .goal-status {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 0.2rem 0.55rem;
+        border-radius: 999px;
+        border: 1px solid var(--outline);
+        opacity: 0.85;
+      }
+      .goal-item .goal-status.active {
+        background: rgba(56, 189, 248, 0.2);
+      }
+      .goal-item .goal-dates {
+        font-size: 0.78rem;
+        color: #666;
+        margin-bottom: 0.5rem;
+      }
+      .goal-item .goal-target {
+        font-size: 0.9rem;
+        margin: 0.25rem 0 0.35rem;
+      }
+      .goal-item .goal-desc {
+        font-size: 0.88rem;
+        color: #444;
+        margin-bottom: 0.65rem;
+        line-height: 1.45;
+      }
+      .goal-item details {
+        margin-top: 0.35rem;
+      }
+      .goal-item summary {
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--outline);
+        user-select: none;
+      }
+      .goal-weekly {
+        margin-top: 0.5rem;
+        display: grid;
+        gap: 0.45rem;
+      }
+      .goal-day {
+        font-size: 0.82rem;
+        line-height: 1.4;
+        padding: 0.4rem 0.5rem;
+        border-radius: 0.4rem;
+        background: rgba(0, 0, 0, 0.04);
+        border-left: 3px solid var(--outline);
+      }
+      .goal-day strong {
+        display: block;
+        font-size: 0.72rem;
+        text-transform: capitalize;
+        opacity: 0.75;
+        margin-bottom: 0.15rem;
+      }
     </style>
   </head>
   <body>
     <main>
       <nav class="profile-nav" aria-label="Profile navigation">
         <a href="/" class="nav-pill">Sign Out</a>
-        <button type="button" class="nav-pill" onclick="alert('AI Coach creates a plan for achieving a user given goal in specific json format, and saves it to profile and goals database.')">Create Goal</button>
+        <a href="/create-goal.html" class="nav-pill" id="createGoalLink">Create Goal</a>
         <!-- We should have this "Create Goal" button instead of a "Generate Workout" button, so the "Talk to AI Agent" button fields general questions,
         meanwhile the "Create Goal" button can take in a specific user goal, output the necessary workout or diet plan, and save it to profile and DB -->
         <a href="/chat/chat.html" class="nav-pill secondary" id="chatSelfLink">Talk to AI Agent</a>
@@ -206,15 +337,100 @@
         </div>
       </div>
 
+      <div class="card" id="goalsCard">
+        <h2>Goals</h2>
+        <p class="muted" id="goalsEmptyNote">
+          No goals saved yet. Use
+          <a href="/create-goal.html" id="goalsCreateGoalInlineLink">Create Goal</a>
+          to add a weekly plan.
+        </p>
+        <div class="goals-list" id="goalsContainer"></div>
+      </div>
+
       <div class="card" id="bioCard">
         <h2>Biometrics</h2>
         <p class="muted" id="bioEmptyNote">No biometrics saved yet.</p>
         <div class="biometrics-grid" id="biometricsGrid"></div>
+
+        <button class="save-btn" id="editBiometricsBtn" type="button">
+          Edit biometrics
+        </button>
+        <div id="bioSaveStatus" class="error" aria-live="polite" style="display:none; margin-top: 0.75rem;"></div>
+
+        <div class="form" id="bioFormSection" style="display:none;">
+          <h2 class="section-title">Edit biometrics</h2>
+          <div class="muted">Saves to your profile using the biometrics endpoint.</div>
+
+          <div class="form-row">
+            <label>
+              <span class="muted">Age</span>
+              <input type="number" id="ageInput" min="0" step="1" placeholder="e.g. 30" />
+            </label>
+            <label>
+              <span class="muted">Sex</span>
+              <select id="sexSelect">
+                <option value="">-- select --</option>
+                <option value="male">male</option>
+                <option value="female">female</option>
+                <option value="non-binary">non-binary</option>
+                <option value="other">other</option>
+              </select>
+            </label>
+            <label>
+              <span class="muted">Height (in)</span>
+              <input type="number" id="heightInInput" min="0" step="0.1" placeholder="e.g. 65" />
+            </label>
+            <label>
+              <span class="muted">Weight (lbs)</span>
+              <input type="number" id="weightLbsInput" min="0" step="0.1" placeholder="e.g. 140" />
+            </label>
+            <label>
+              <span class="muted">Activity level (optional)</span>
+              <select id="activityLevelSelect">
+                <option value="">-- not set --</option>
+                <option value="low">low</option>
+                <option value="light">light</option>
+                <option value="moderate">moderate</option>
+                <option value="active">active</option>
+                <option value="very_active">very_active</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="form-row">
+            <label style="flex: 1 1 260px; min-width: 260px;">
+              <span class="muted">Medical conditions (optional)</span>
+              <textarea id="medicalConditionsInput" placeholder="Comma-separated, e.g. asthma, hypertension"></textarea>
+            </label>
+            <label style="flex: 1 1 260px; min-width: 260px;">
+              <span class="muted">Dietary preferences (optional)</span>
+              <textarea id="dietaryPreferencesInput" placeholder="Comma-separated, e.g. vegetarian, gluten-free"></textarea>
+            </label>
+          </div>
+
+          <div class="form-row">
+            <label style="flex: 1 1 100%; min-width: 260px;">
+              <span class="muted">Injuries or limitations (optional)</span>
+              <textarea id="injuriesOrLimitationsInput" placeholder="Comma-separated, e.g. knee pain when running, limited shoulder mobility"></textarea>
+            </label>
+          </div>
+
+          <button class="save-btn" id="saveBiometricsBtn" type="button">
+            Save biometrics
+          </button>
+        </div>
       </div>
     </main>
 
     <script>
       var PROFILE_USER_ID_KEY = 'healthCoachProfileUserId';
+
+      function redirectToLogin() {
+        try {
+          sessionStorage.removeItem(PROFILE_USER_ID_KEY);
+        } catch (e) {}
+        window.location.href = '/login.html';
+      }
 
       function resolveProfileUserId() {
         var params = new URLSearchParams(window.location.search);
@@ -234,26 +450,110 @@
 
       function wireNavLinks(userId) {
         var profileLink = document.getElementById('profileSelfLink');
-        var chatLink = document.getElementById('chatFromProfileLink');
+        var chatLink = document.getElementById('chatSelfLink'); // fixed id
+        var createGoalLink = document.getElementById('createGoalLink');
+
         if (userId) {
           profileLink.href = '/profile.html?id=' + encodeURIComponent(userId);
           profileLink.hidden = false;
           profileLink.removeAttribute('aria-disabled');
+
           if (chatLink) {
             chatLink.href = '/chat/chat.html?userId=' + encodeURIComponent(userId);
+          }
+          if (createGoalLink) {
+            createGoalLink.href = '/create-goal.html?userId=' + encodeURIComponent(userId);
+          }
+          var goalsInline = document.getElementById('goalsCreateGoalInlineLink');
+          if (goalsInline) {
+            goalsInline.href = '/create-goal.html?userId=' + encodeURIComponent(userId);
           }
         } else {
           profileLink.removeAttribute('href');
           profileLink.hidden = true;
           profileLink.setAttribute('aria-disabled', 'true');
+
           if (chatLink) {
             chatLink.href = '/chat/chat.html';
+          }
+          if (createGoalLink) {
+            createGoalLink.href = '/create-goal.html';
+          }
+          var goalsInline = document.getElementById('goalsCreateGoalInlineLink');
+          if (goalsInline) {
+            goalsInline.href = '/create-goal.html';
           }
         }
       }
 
+      let currentUserId = null;
+
+      function showBioForm() {
+        const bioFormSection = document.getElementById('bioFormSection');
+        const editBtn = document.getElementById('editBiometricsBtn');
+        if (bioFormSection) bioFormSection.style.display = 'block';
+        if (editBtn) editBtn.style.display = 'none';
+        const statusEl = document.getElementById('bioSaveStatus');
+        if (statusEl) {
+          statusEl.textContent = '';
+          statusEl.style.display = 'none';
+        }
+      }
+
+      function hideBioForm() {
+        const bioFormSection = document.getElementById('bioFormSection');
+        const editBtn = document.getElementById('editBiometricsBtn');
+        if (bioFormSection) bioFormSection.style.display = 'none';
+        if (editBtn) editBtn.style.display = 'inline-block';
+        const statusEl = document.getElementById('bioSaveStatus');
+        if (statusEl) {
+          statusEl.textContent = '';
+          statusEl.style.display = 'none';
+        }
+      }
+
       async function fetchUser(id) {
-        const res = await fetch('/users/' + encodeURIComponent(id));
+        const res = await fetch('/users/' + encodeURIComponent(id), {
+          credentials: 'same-origin'
+        });
+
+        if (res.status === 401 || res.status === 403) {
+          redirectToLogin();
+          throw new Error('Unauthorized');
+        }
+
+        const contentType = res.headers.get('content-type') || '';
+
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || 'Request failed with ' + res.status);
+        }
+
+        if (!contentType.includes('application/json')) {
+          redirectToLogin();
+          throw new Error('Expected JSON response but received something else.');
+        }
+
+        return res.json();
+      }
+
+      function escapeHtml(s) {
+        if (s === null || s === undefined) return '';
+        return String(s)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      async function fetchGoals(userId) {
+        const res = await fetch('/goals/user/' + encodeURIComponent(userId), {
+          credentials: 'same-origin'
+        });
+        if (res.status === 401 || res.status === 403) {
+          redirectToLogin();
+          throw new Error('Unauthorized');
+        }
         if (!res.ok) {
           const text = await res.text();
           throw new Error(text || 'Request failed with ' + res.status);
@@ -261,7 +561,100 @@
         return res.json();
       }
 
+      function renderGoals(goals) {
+        const empty = document.getElementById('goalsEmptyNote');
+        const container = document.getElementById('goalsContainer');
+        if (!empty || !container) return;
+
+        container.innerHTML = '';
+        if (!goals || !goals.length) {
+          empty.style.display = 'block';
+          return;
+        }
+
+        empty.style.display = 'none';
+
+        const dayOrder = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+        for (var i = 0; i < goals.length; i++) {
+          var g = goals[i];
+          var weekly = g.weeklyPlan || g.plan || null;
+          var article = document.createElement('article');
+          article.className = 'goal-item';
+          article.setAttribute('data-goal-id', g._id || '');
+
+          var status = (g.status || 'active').toLowerCase();
+          var created = g.createdAt ? new Date(g.createdAt).toLocaleString() : '—';
+          var updated = g.updatedAt ? new Date(g.updatedAt).toLocaleString() : '—';
+
+          var header = document.createElement('header');
+          var typeSpan = document.createElement('span');
+          typeSpan.className = 'goal-type';
+          typeSpan.textContent = g.type || 'Goal';
+          var statusSpan = document.createElement('span');
+          statusSpan.className = 'goal-status' + (status === 'active' ? ' active' : '');
+          statusSpan.textContent = g.status || 'active';
+          header.appendChild(typeSpan);
+          header.appendChild(statusSpan);
+          article.appendChild(header);
+
+          var dates = document.createElement('div');
+          dates.className = 'goal-dates';
+          dates.textContent = 'Created ' + created + ' · Updated ' + updated;
+          article.appendChild(dates);
+
+          if (g.target) {
+            var targetP = document.createElement('p');
+            targetP.className = 'goal-target';
+            targetP.innerHTML = '<strong>Target:</strong> ' + escapeHtml(g.target);
+            article.appendChild(targetP);
+          }
+
+          if (g.description) {
+            var descP = document.createElement('p');
+            descP.className = 'goal-desc';
+            descP.textContent = g.description;
+            article.appendChild(descP);
+          }
+
+          if (weekly && typeof weekly === 'object') {
+            var details = document.createElement('details');
+            var summary = document.createElement('summary');
+            summary.textContent = 'Weekly plan';
+            details.appendChild(summary);
+
+            var wrap = document.createElement('div');
+            wrap.className = 'goal-weekly';
+
+            for (var d = 0; d < dayOrder.length; d++) {
+              var key = dayOrder[d];
+              var val = weekly[key];
+              if (val === undefined || val === null || val === '') continue;
+              var dayEl = document.createElement('div');
+              dayEl.className = 'goal-day';
+              var strong = document.createElement('strong');
+              strong.textContent = key;
+              dayEl.appendChild(strong);
+              var body = document.createElement('div');
+              body.style.whiteSpace = 'pre-wrap';
+              body.textContent = String(val);
+              dayEl.appendChild(body);
+              wrap.appendChild(dayEl);
+            }
+
+            details.appendChild(wrap);
+            article.appendChild(details);
+          }
+
+          container.appendChild(article);
+        }
+      }
+
       function renderProfile(user) {
+        currentUserId = user?._id ? user._id : currentUserId;
+
+        hideBioForm();
+
         const nameHeading = document.getElementById('nameHeading');
         const emailLine = document.getElementById('emailLine');
         const joinedEl = document.getElementById('joined');
@@ -281,47 +674,284 @@
         bioGrid.innerHTML = '';
         if (!user.biometrics) {
           bioEmptyNote.style.display = 'block';
-          return;
-        }
+        } else {
+          bioEmptyNote.style.display = 'none';
+          prefillBiometricsForm(user.biometrics);
 
-        bioEmptyNote.style.display = 'none';
-        const entries = Object.entries(user.biometrics);
-        for (const [key, value] of entries) {
-          if (value === null || value === undefined || value === '') continue;
-          const item = document.createElement('div');
-          item.className = 'field';
-          const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
-          let display = value;
+          const entries = Object.entries(user.biometrics);
+          for (const [key, value] of entries) {
+            if (value === null || value === undefined || value === '') continue;
+            const item = document.createElement('div');
+            item.className = 'field';
+            const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
+            let display = value;
 
-          if (Array.isArray(value)) {
-            display = value.join(', ');
-          } else if (typeof value === 'object') {
-            display = Object.entries(value)
-              .filter(([, v]) => v)
-              .map(([k]) => k)
-              .join(', ');
+            if (Array.isArray(value)) {
+              display = value.join(', ');
+            } else if (typeof value === 'object') {
+              display = Object.entries(value)
+                .filter(([, v]) => v)
+                .map(([k]) => k)
+                .join(', ');
+            }
+
+            item.innerHTML = '<strong>' + label + ':</strong> <span>' + display + '</span>';
+            bioGrid.appendChild(item);
           }
-
-          item.innerHTML = '<strong>' + label + ':</strong> <span>' + display + '</span>';
-          bioGrid.appendChild(item);
         }
       }
 
-      // Load profile from ?id= or from session (after login we store id on first visit).
+      function setBioSaveStatus(message, isError) {
+        const statusEl = document.getElementById('bioSaveStatus');
+        if (!message) {
+          statusEl.textContent = '';
+          statusEl.style.display = 'none';
+          return;
+        }
+        statusEl.textContent = message;
+        statusEl.style.display = 'block';
+        statusEl.style.color = isError ? '#fecaca' : '#bbf7d0';
+      }
+
+      function clearBiometricsForm() {
+        const ageInput = document.getElementById('ageInput');
+        const sexSelect = document.getElementById('sexSelect');
+        const heightInInput = document.getElementById('heightInInput');
+        const weightLbsInput = document.getElementById('weightLbsInput');
+        const activityLevelSelect = document.getElementById('activityLevelSelect');
+        const medicalConditionsInput = document.getElementById('medicalConditionsInput');
+        const dietaryPreferencesInput = document.getElementById('dietaryPreferencesInput');
+        const injuriesOrLimitationsInput = document.getElementById('injuriesOrLimitationsInput');
+        if (ageInput) ageInput.value = '';
+        if (sexSelect) sexSelect.value = '';
+        if (heightInInput) heightInInput.value = '';
+        if (weightLbsInput) weightLbsInput.value = '';
+        if (activityLevelSelect) activityLevelSelect.value = '';
+        if (medicalConditionsInput) medicalConditionsInput.value = '';
+        if (dietaryPreferencesInput) dietaryPreferencesInput.value = '';
+        if (injuriesOrLimitationsInput) injuriesOrLimitationsInput.value = '';
+      }
+
+      function prefillBiometricsForm(biometrics) {
+        if (!biometrics || typeof biometrics !== 'object') {
+          clearBiometricsForm();
+          return;
+        }
+        const ageInput = document.getElementById('ageInput');
+        const sexSelect = document.getElementById('sexSelect');
+        const heightInInput = document.getElementById('heightInInput');
+        const weightLbsInput = document.getElementById('weightLbsInput');
+        const activityLevelSelect = document.getElementById('activityLevelSelect');
+        const medicalConditionsInput = document.getElementById('medicalConditionsInput');
+        const dietaryPreferencesInput = document.getElementById('dietaryPreferencesInput');
+        const injuriesOrLimitationsInput = document.getElementById('injuriesOrLimitationsInput');
+
+        if (ageInput) ageInput.value = biometrics.age ?? '';
+        if (sexSelect) sexSelect.value = biometrics.sex ?? '';
+        if (heightInInput) heightInInput.value = biometrics.heightIn ?? '';
+        if (weightLbsInput) weightLbsInput.value = biometrics.weightLbs ?? '';
+        if (activityLevelSelect) activityLevelSelect.value = biometrics.activityLevel ?? '';
+
+        if (medicalConditionsInput) {
+          medicalConditionsInput.value = Array.isArray(biometrics.medicalConditions)
+            ? biometrics.medicalConditions.join(', ')
+            : (biometrics.medicalConditions ?? '');
+        }
+        if (dietaryPreferencesInput) {
+          dietaryPreferencesInput.value = Array.isArray(biometrics.dietaryPreferences)
+            ? biometrics.dietaryPreferences.join(', ')
+            : (biometrics.dietaryPreferences ?? '');
+        }
+        if (injuriesOrLimitationsInput) {
+          injuriesOrLimitationsInput.value = Array.isArray(biometrics.injuriesOrLimitations)
+            ? biometrics.injuriesOrLimitations.join(', ')
+            : (biometrics.injuriesOrLimitations ?? '');
+        }
+      }
+
+      async function saveBiometrics() {
+        const errorEl = document.getElementById('bioSaveStatus');
+        if (errorEl) {
+          errorEl.textContent = '';
+          errorEl.style.display = 'none';
+        }
+
+        const userId = currentUserId;
+        if (!userId) {
+          setBioSaveStatus('No user loaded. Please log in first.', true);
+          return;
+        }
+
+        const ageRaw = document.getElementById('ageInput').value;
+        const sex = document.getElementById('sexSelect').value;
+        const heightInRaw = document.getElementById('heightInInput').value;
+        const weightLbsRaw = document.getElementById('weightLbsInput').value;
+        const activityLevel = document.getElementById('activityLevelSelect').value;
+        const medicalConditionsRaw = document.getElementById('medicalConditionsInput').value;
+        const dietaryPreferencesRaw = document.getElementById('dietaryPreferencesInput').value;
+        const injuriesOrLimitationsRaw = document.getElementById('injuriesOrLimitationsInput').value;
+
+        if (!sex) {
+          setBioSaveStatus('Please select a sex value.', true);
+          return;
+        }
+
+        const next = { ...(window.__lastUserBiometrics || {}) };
+        next.sex = sex;
+
+        function parseStringList(raw) {
+          if (raw === null || raw === undefined) return undefined;
+          const s = String(raw).trim();
+          if (!s) return undefined;
+          const parts = s
+            .split(',')
+            .map((p) => p.trim())
+            .filter(Boolean);
+          return parts.length ? parts : undefined;
+        }
+
+        if (ageRaw !== '') {
+          const age = Number(ageRaw);
+          if (!Number.isFinite(age) || age < 0) {
+            setBioSaveStatus('Age must be 0 or greater.', true);
+            return;
+          }
+          next.age = age;
+        }
+
+        if (heightInRaw !== '') {
+          const heightIn = Number(heightInRaw);
+          if (!Number.isFinite(heightIn) || heightIn <= 0) {
+            setBioSaveStatus('Height must be greater than 0.', true);
+            return;
+          }
+          next.heightIn = heightIn;
+        }
+
+        if (weightLbsRaw !== '') {
+          const weightLbs = Number(weightLbsRaw);
+          if (!Number.isFinite(weightLbs) || weightLbs <= 0) {
+            setBioSaveStatus('Weight must be greater than 0.', true);
+            return;
+          }
+          next.weightLbs = weightLbs;
+        }
+
+        if (activityLevel) {
+          next.activityLevel = activityLevel;
+        } else {
+          delete next.activityLevel;
+        }
+
+        const medicalConditions = parseStringList(medicalConditionsRaw);
+        if (medicalConditions !== undefined) next.medicalConditions = medicalConditions;
+        else delete next.medicalConditions;
+
+        const dietaryPreferences = parseStringList(dietaryPreferencesRaw);
+        if (dietaryPreferences !== undefined) next.dietaryPreferences = dietaryPreferences;
+        else delete next.dietaryPreferences;
+
+        const injuriesOrLimitations = parseStringList(injuriesOrLimitationsRaw);
+        if (injuriesOrLimitations !== undefined) next.injuriesOrLimitations = injuriesOrLimitations;
+        else delete next.injuriesOrLimitations;
+
+        try {
+          setBioSaveStatus('Saving...', false);
+
+          const res = await fetch('/users/' + encodeURIComponent(userId) + '/biometrics', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify(next)
+          });
+
+          if (res.status === 401 || res.status === 403) {
+            redirectToLogin();
+            return;
+          }
+
+          const text = await res.text();
+          if (!res.ok) {
+            throw new Error(text || `Save failed with status ${res.status}`);
+          }
+
+          const refreshed = await fetchUser(userId);
+          window.__lastUserBiometrics = refreshed?.biometrics || null;
+          renderProfile(refreshed);
+          try {
+            const goals = await fetchGoals(userId);
+            renderGoals(goals);
+          } catch (e) {
+            /* ignore goals refresh errors */
+          }
+          setBioSaveStatus('Saved biometrics successfully.', false);
+          hideBioForm();
+        } catch (err) {
+          if (err.message !== 'Unauthorized') {
+            setBioSaveStatus('Save failed: ' + err.message, true);
+          }
+        }
+      }
+
+      async function loadFromInput() {
+        const id = document.getElementById('userIdInput').value.trim();
+        const errorEl = document.getElementById('error');
+        errorEl.textContent = '';
+
+        if (!id) {
+          errorEl.textContent = 'Please enter a user id.';
+          return;
+        }
+
+        try {
+          currentUserId = id;
+          const user = await fetchUser(id);
+          window.__lastUserBiometrics = user?.biometrics || null;
+          renderProfile(user);
+          const goals = await fetchGoals(id);
+          renderGoals(goals);
+        } catch (err) {
+          if (err.message !== 'Unauthorized') {
+            errorEl.textContent = 'Could not load user: ' + err.message;
+          }
+        }
+      }
+
       (function init() {
         var userId = resolveProfileUserId();
         wireNavLinks(userId);
+
         if (userId) {
           fetchUser(userId)
-            .then(renderProfile)
+            .then(function (user) {
+              renderProfile(user);
+              return fetchGoals(userId).catch(function () {
+                return [];
+              });
+            })
+            .then(renderGoals)
             .catch(function (err) {
-              var errorEl = document.getElementById('error');
-              errorEl.textContent = 'Could not load user: ' + err.message;
+              if (err.message !== 'Unauthorized') {
+                var errorEl = document.getElementById('error');
+                errorEl.textContent = 'Could not load user: ' + err.message;
+              }
             });
         } else {
-          var errorEl = document.getElementById('error');
-          errorEl.textContent = 'No user specified. Please log in first.';
+          redirectToLogin();
+          return;
         }
+
+        document.getElementById('saveBiometricsBtn').addEventListener('click', saveBiometrics);
+        document.getElementById('editBiometricsBtn').addEventListener('click', () => {
+          if (!currentUserId) {
+            setBioSaveStatus('No user loaded. Please log in first.', true);
+            hideBioForm();
+            return;
+          }
+          showBioForm();
+        });
+
+        hideBioForm();
       })();
     </script>
   </body>

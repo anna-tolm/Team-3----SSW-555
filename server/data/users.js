@@ -1,7 +1,7 @@
 import { users } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
-import { helperMethods } from '../helpers.js';
+import helperMethods from '../helpers.js';
 
 // USER SCHEMA
 // type User = {
@@ -14,7 +14,7 @@ import { helperMethods } from '../helpers.js';
 //     mealLogs: MealLog[];                     // default []
 //     dateJoined: Date;                        // required
 //   };
-  
+
 // type Biometrics = {
 //     age: number;
 //     sex: "male" | "female" | "non-binary" | "other";

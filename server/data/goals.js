@@ -1,19 +1,27 @@
 import { goals as goalsCollection } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
-import { helperMethods } from '../helpers.js';
+import helperMethods from '../helpers.js';
 import { getUserById } from './users.js';
 
 // GOAL SCHEMA
 // type Goal = {
 //   _id: ObjectId;
 //   userId: ObjectId;              // required (references users._id)
-//   type: string;                  // required (e.g. "weight" | "fitness" | "tracking")
-//   target: any | null;            // optional
-//   description: string | null;    // optional
-//   plan: object | string | null;  // AI-suggested plan
+//   type: string;                  // required (e.g. "weight gain/loss" | "fitness" | "nutrition")
+//   target: string;                // required -- could be a target weight, weightlifting personal record, etc
+//   description: string;           // required -- description of the goal
+//   weeklyPlan: {                  // required -- AI-suggested weekly plan for the goal, with recommended exercises, meals, etc. by day of the week
+//     sunday: string;               // required -- description of the plan for Sunday
+//     monday: string;               // required -- description of the plan for Monday
+//     tuesday: string;              // required -- description of the plan for Tuesday
+//     wednesday: string;            // required -- description of the plan for Wednesday
+//     thursday: string;             // required -- description of the plan for Thursday
+//     friday: string;               // required -- description of the plan for Friday
+//     saturday: string;             // required -- description of the plan for Saturday
+//   }
 //   status: string;                // default "active" (e.g. "active", "completed", "archived")
-//   createdAt: Date;               // required
-//   updatedAt: Date;               // required
+//   createdAt: Date;               // generated when goal is created
+//   updatedAt: Date;               // generated when goal is updated
 // };
 
 // Create a goal for a user with an optional AI-suggested plan.
@@ -24,12 +32,25 @@ export const createGoal = async (userId, goalData) => {
   if (!goalData || typeof goalData !== 'object') throw 'Goal data must be an object';
   const type = helperMethods.checkString(goalData.type || goalData.goalType, 'type');
 
+  // Accept either weeklyPlan (preferred) or plan (legacy) and normalize.
+  const weeklyPlan = goalData.weeklyPlan ?? goalData.plan;
+  if (!weeklyPlan || typeof weeklyPlan !== 'object') throw 'weeklyPlan is required and must be an object';
+
+  const requiredDays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const normalizedWeeklyPlan = {};
+  for (const day of requiredDays) {
+    normalizedWeeklyPlan[day] = helperMethods.checkString(weeklyPlan[day], `weeklyPlan.${day}`);
+  }
+
+  const target = helperMethods.checkString(goalData.target, 'target');
+  const description = helperMethods.checkString(goalData.description, 'description');
+
   const goal = {
     userId: new ObjectId(userId),
     type,
-    target: goalData.target ?? null,
-    description: goalData.description ? helperMethods.checkString(goalData.description, 'description') : null,
-    plan: goalData.plan ?? null,
+    target,
+    description,
+    weeklyPlan: normalizedWeeklyPlan,
     status: goalData.status || 'active',
     createdAt: new Date(),
     updatedAt: new Date()
@@ -101,12 +122,18 @@ export const updatePlan = async (userId, goalId, plan) => {
   if (!goal) throw 'Goal not found';
   if (goal.userId.toString() !== userId) throw 'You can only update your own goals';
   if (goal.status !== 'active') throw 'You can only update active goals';
-  if (!plan || typeof plan !== 'object' && typeof plan !== 'string') throw 'Plan must be an object or string';
+  if (!plan || typeof plan !== 'object') throw 'weeklyPlan must be an object';
+
+  const requiredDays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const normalizedWeeklyPlan = {};
+  for (const day of requiredDays) {
+    normalizedWeeklyPlan[day] = helperMethods.checkString(plan[day], `weeklyPlan.${day}`);
+  }
 
   const col = await goalsCollection();
   const result = await col.findOneAndUpdate(
     { _id: new ObjectId(goalId) },
-    { $set: { plan, updatedAt: new Date() } },
+    { $set: { weeklyPlan: normalizedWeeklyPlan, updatedAt: new Date() } },
     { returnDocument: 'after' }
   );
   if (!result) throw 'Goal not found';
@@ -137,7 +164,7 @@ function serializeGoal(goal) {
     type: goal.type,
     target: goal.target,
     description: goal.description,
-    plan: goal.plan,
+    weeklyPlan: goal.weeklyPlan ?? null,
     status: goal.status,
     createdAt: goal.createdAt?.toISOString?.(),
     updatedAt: goal.updatedAt?.toISOString?.()
