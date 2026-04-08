@@ -19,6 +19,7 @@ import { getUserById } from './users.js';
 //     friday: string;               // required -- description of the plan for Friday
 //     saturday: string;             // required -- description of the plan for Saturday
 //   }
+//   completedDays: string[];       // days the user has checked off (e.g. ["sunday", "monday"])
 //   status: string;                // default "active" (e.g. "active", "completed", "archived")
 //   createdAt: Date;               // generated when goal is created
 //   updatedAt: Date;               // generated when goal is updated
@@ -51,6 +52,7 @@ export const createGoal = async (userId, goalData) => {
     target,
     description,
     weeklyPlan: normalizedWeeklyPlan,
+    completedDays: [],
     status: goalData.status || 'active',
     createdAt: new Date(),
     updatedAt: new Date()
@@ -140,6 +142,31 @@ export const updatePlan = async (userId, goalId, plan) => {
   return serializeGoal(result);
 };
 
+// Toggle a day as completed/incomplete for a goal.
+export const toggleDayCompletion = async (goalId, day) => {
+  goalId = helperMethods.checkId(goalId, 'goalId');
+  const validDays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  if (!validDays.includes(day)) throw 'Invalid day';
+
+  const col = await goalsCollection();
+  const goal = await col.findOne({ _id: new ObjectId(goalId) });
+  if (!goal) throw 'Goal not found';
+
+  const completedDays = goal.completedDays || [];
+  const alreadyDone = completedDays.includes(day);
+  const update = alreadyDone
+    ? { $pull: { completedDays: day }, $set: { updatedAt: new Date() } }
+    : { $addToSet: { completedDays: day }, $set: { updatedAt: new Date() } };
+
+  const result = await col.findOneAndUpdate(
+    { _id: new ObjectId(goalId) },
+    update,
+    { returnDocument: 'after' }
+  );
+  if (!result) throw 'Goal not found';
+  return serializeGoal(result);
+};
+
 // Delete a goal. Only a user can delete their own goals.
 export const deleteGoal = async (userId, goalId) => {
   userId = helperMethods.checkId(userId, 'userId');
@@ -165,6 +192,7 @@ function serializeGoal(goal) {
     target: goal.target,
     description: goal.description,
     weeklyPlan: goal.weeklyPlan ?? null,
+    completedDays: goal.completedDays ?? [],
     status: goal.status,
     createdAt: goal.createdAt?.toISOString?.(),
     updatedAt: goal.updatedAt?.toISOString?.()

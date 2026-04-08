@@ -307,6 +307,27 @@
         opacity: 0.75;
         margin-bottom: 0.15rem;
       }
+      .goal-day.completed {
+        background: rgba(34, 197, 94, 0.12);
+        border-left-color: #22c55e;
+        opacity: 0.8;
+      }
+      .goal-day.completed .goal-day-body {
+        text-decoration: line-through;
+        color: #6b7280;
+      }
+      .goal-day-header {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .goal-day-check {
+        width: 1rem;
+        height: 1rem;
+        cursor: pointer;
+        accent-color: #22c55e;
+        flex-shrink: 0;
+      }
     </style>
   </head>
   <body>
@@ -546,6 +567,30 @@
           .replace(/"/g, '&quot;');
       }
 
+      async function handleDayToggle(event) {
+        var checkbox = event.target;
+        var dayEl = checkbox.closest('.goal-day');
+        if (!dayEl) return;
+        var goalId = dayEl.getAttribute('data-goal-id');
+        var day = dayEl.getAttribute('data-day');
+        checkbox.disabled = true;
+        try {
+          var res = await fetch('/goals/' + encodeURIComponent(goalId) + '/days/' + encodeURIComponent(day) + '/toggle', {
+            method: 'PATCH',
+            credentials: 'same-origin'
+          });
+          if (!res.ok) throw new Error('Request failed');
+          var updated = await res.json();
+          var done = Array.isArray(updated.completedDays) && updated.completedDays.includes(day);
+          dayEl.classList.toggle('completed', done);
+          checkbox.checked = done;
+        } catch (e) {
+          checkbox.checked = !checkbox.checked;
+        } finally {
+          checkbox.disabled = false;
+        }
+      }
+
       async function fetchGoals(userId) {
         const res = await fetch('/goals/user/' + encodeURIComponent(userId), {
           credentials: 'same-origin'
@@ -626,16 +671,36 @@
             var wrap = document.createElement('div');
             wrap.className = 'goal-weekly';
 
+            var completedDays = Array.isArray(g.completedDays) ? g.completedDays : [];
+
             for (var d = 0; d < dayOrder.length; d++) {
               var key = dayOrder[d];
               var val = weekly[key];
               if (val === undefined || val === null || val === '') continue;
+              var isDone = completedDays.includes(key);
               var dayEl = document.createElement('div');
-              dayEl.className = 'goal-day';
+              dayEl.className = 'goal-day' + (isDone ? ' completed' : '');
+              dayEl.setAttribute('data-goal-id', g._id || '');
+              dayEl.setAttribute('data-day', key);
+
+              var dayHeader = document.createElement('div');
+              dayHeader.className = 'goal-day-header';
+
+              var checkbox = document.createElement('input');
+              checkbox.type = 'checkbox';
+              checkbox.className = 'goal-day-check';
+              checkbox.checked = isDone;
+              checkbox.setAttribute('aria-label', 'Mark ' + key + ' as completed');
+              checkbox.addEventListener('change', handleDayToggle);
+
               var strong = document.createElement('strong');
               strong.textContent = key;
-              dayEl.appendChild(strong);
+              dayHeader.appendChild(checkbox);
+              dayHeader.appendChild(strong);
+              dayEl.appendChild(dayHeader);
+
               var body = document.createElement('div');
+              body.className = 'goal-day-body';
               body.style.whiteSpace = 'pre-wrap';
               body.textContent = String(val);
               dayEl.appendChild(body);
