@@ -18,8 +18,61 @@ body {
 }
 
 .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 0px;
   padding-bottom: 0px;
+}
+
+.site-logo-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.site-logo {
+  display: block;
+  width: 72px;
+  max-width: 20vw;
+  height: auto;
+  object-fit: contain;
+}
+
+.profile-nav {
+  position: relative;
+  min-height: 56px;
+  padding-right: 5.75rem;
+}
+
+.profile-nav .site-logo-link {
+  position: absolute;
+  top: 50%;
+  right: 0.85rem;
+  margin-left: 0;
+  padding: 0.15rem;
+  border-radius: 0.75rem;
+  transform: translateY(-50%);
+}
+
+.profile-nav .site-logo-link:hover {
+  background: rgba(0, 0, 0, 0.05);
+  transform: translateY(calc(-50% - 1px));
+}
+
+@media (max-width: 640px) {
+  .profile-nav {
+    min-height: 64px;
+    padding-right: 4.75rem;
+  }
+
+  .site-logo {
+    width: 56px;
+  }
 }
 .full-divider {
   border: none;
