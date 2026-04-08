@@ -327,6 +327,9 @@
         meanwhile the "Create Goal" button can take in a specific user goal, output the necessary workout or diet plan, and save it to profile and DB -->
         <a href="/chat/chat.html" class="nav-pill secondary" id="chatSelfLink">Talk to AI Agent</a>
         <a href="/profile.html" class="nav-pill secondary" id="profileSelfLink">View Profile</a>
+        <a class="site-logo-link" data-profile-link href="/profile.html" aria-label="Go to profile">
+          <img class="site-logo" src="/logo.png" alt="Health Coach logo" />
+        </a>
       </nav>
 
       <div id="error" class="error" aria-live="polite"></div>
@@ -431,6 +434,7 @@
       </div>
     </main>
 
+    <script src="/profileLink.js"></script>
     <script>
       var PROFILE_USER_ID_KEY = 'healthCoachProfileUserId';
 
