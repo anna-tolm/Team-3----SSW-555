@@ -259,6 +259,15 @@
         border: 1px solid var(--outline);
         opacity: 0.85;
       }
+      .goal-status-select {
+        border: 1px solid var(--outline);;
+        padding: 5px;
+        border-radius: 999px;;
+        background: transparent;
+        font-weight: bold;
+        cursor: pointer;    
+        font-size: 0.9rem;
+}
       .goal-item .goal-status.active {
         background: rgba(56, 189, 248, 0.2);
       }
@@ -591,12 +600,40 @@
           var typeSpan = document.createElement('span');
           typeSpan.className = 'goal-type';
           typeSpan.textContent = g.type || 'Goal';
-          var statusSpan = document.createElement('span');
-          statusSpan.className = 'goal-status' + (status === 'active' ? ' active' : '');
-          statusSpan.textContent = g.status || 'active';
+          //var statusSpan = document.createElement('span');
+          //statusSpan.className = 'goal-status' + (status === 'active' ? ' active' : '');
+          //statusSpan.textContent = g.status || 'active';
           header.appendChild(typeSpan);
-          header.appendChild(statusSpan);
+          //header.appendChild(statusSpan);
           article.appendChild(header);
+
+          var statusSelect = document.createElement('select');
+          statusSelect.className = "goal-status-select";
+
+          ['active', 'complete', 'archive'].forEach(function(option) {
+            var opt = document.createElement('option');
+            opt.value = option;
+            opt.textContent = option.charAt(0).toUpperCase() + option.slice(1); // UI label
+            if(option === status) opt.selected = true;
+            statusSelect.appendChild(opt);
+          });
+          statusSelect.addEventListener('change', async function(){
+            const newStatus = this.value;
+            const goalId = this.g._id;
+
+            try{
+              const response = await fetch(`/goals/${goalId}`,{
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus})
+              });
+              if(!response.ok) throw new Error ('Failed to update');
+              console.log('Status updated to', newStatus);
+            }catch (e){
+              alert('Failed to update status');
+            }
+          })
+          header.appendChild(statusSelect);
 
           var dates = document.createElement('div');
           dates.className = 'goal-dates';
