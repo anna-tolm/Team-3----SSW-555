@@ -62,6 +62,18 @@ router.route('/:id/plan').put(async (req, res) => {
   }
 });
 
+// PATCH /goals/:id/days/:day/toggle - toggle a day as completed/incomplete
+router.route('/:id/days/:day/toggle').patch(async (req, res) => {
+  try {
+    const id = helperMethods.checkId(req.params.id, 'id');
+    const day = req.params.day.toLowerCase();
+    const goal = await goalData.toggleDayCompletion(id, day);
+    res.json(goal);
+  } catch (e) {
+    res.status(400).json({ error: e?.message ?? e });
+  }
+});
+
 // DELETE /goals/:id
 router.route('/:id').delete(async (req, res) => {
   try {
