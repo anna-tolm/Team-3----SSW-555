@@ -163,4 +163,28 @@ router.route('/:id/meals').get(async (req, res) => {
   }
 });
 
+// PATCH /users/:id/meals/:mealId - update a saved meal log
+router.route('/:id/meals/:mealId').patch(async (req, res) => {
+  try {
+    const id = helperMethods.checkId(req.params.id, 'id');
+    const mealId = helperMethods.checkId(req.params.mealId, 'mealId');
+    const meal = await userData.updateMealLog(id, mealId, req.body);
+    res.json(meal);
+  } catch (e) {
+    res.status(400).json({ error: e?.message ?? e });
+  }
+});
+
+// DELETE /users/:id/meals/:mealId - delete a saved meal log
+router.route('/:id/meals/:mealId').delete(async (req, res) => {
+  try {
+    const id = helperMethods.checkId(req.params.id, 'id');
+    const mealId = helperMethods.checkId(req.params.mealId, 'mealId');
+    const result = await userData.deleteMealLog(id, mealId);
+    res.json(result);
+  } catch (e) {
+    res.status(400).json({ error: e?.message ?? e });
+  }
+});
+
 export default router;

@@ -3,6 +3,18 @@ import { ObjectId } from 'mongodb';
 import helperMethods from '../helpers.js';
 import { getUserById } from './users.js';
 
+const GOAL_STATUSES = ['active', 'completed', 'archived'];
+
+function normalizeGoalStatus(status, varName = 'status') {
+  const normalized = helperMethods.checkString(status, varName).toLowerCase();
+  if (normalized === 'complete') return 'completed';
+  if (normalized === 'archive') return 'archived';
+  if (!GOAL_STATUSES.includes(normalized)) {
+    throw `${varName} must be one of: ${GOAL_STATUSES.join(', ')}`;
+  }
+  return normalized;
+}
+
 // GOAL SCHEMA
 // type Goal = {
 //   _id: ObjectId;
@@ -53,7 +65,7 @@ export const createGoal = async (userId, goalData) => {
     description,
     weeklyPlan: normalizedWeeklyPlan,
     completedDays: [],
-    status: goalData.status || 'active',
+    status: goalData.status ? normalizeGoalStatus(goalData.status, 'status') : 'active',
     createdAt: new Date(),
     updatedAt: new Date()
   };
@@ -81,7 +93,7 @@ export const getGoalsByUserId = async (userId, options = {}) => {
   if (!user) throw 'User not found';
   const col = await goalsCollection();
   const query = { userId: new ObjectId(userId) };
-  if (options.status) query.status = helperMethods.checkString(options.status, 'status');
+  if (options.status) query.status = normalizeGoalStatus(options.status, 'status');
 
   const list = await col.find(query).sort({ createdAt: -1 }).toArray();
   return list.map(serializeGoal);
@@ -96,13 +108,26 @@ export const updateGoal = async (userId, goalId, updates) => {
   const goal = await getGoalById(goalId);
   if (!goal) throw 'Goal not found';
   if (goal.userId.toString() !== userId) throw 'You can only update your own goals';
-  if (goal.status !== 'active') throw 'You can only update active goals';
   if (!updates || typeof updates !== 'object') throw 'Updates must be an object';
 
   const toSet = { updatedAt: new Date() };
-  if (updates.target !== undefined) toSet.target = updates.target;
-  if (updates.description !== undefined) toSet.description = helperMethods.checkString(updates.description, 'description');
-  if (updates.status !== undefined) toSet.status = helperMethods.checkString(updates.status, 'status');
+  const currentStatus = normalizeGoalStatus(goal.status || 'active', 'status');
+
+  if (updates.target !== undefined) {
+    if (currentStatus !== 'active') throw 'You can only edit goal details while the goal is active';
+    toSet.target = helperMethods.checkString(updates.target, 'target');
+  }
+  if (updates.description !== undefined) {
+    if (currentStatus !== 'active') throw 'You can only edit goal details while the goal is active';
+    toSet.description = helperMethods.checkString(updates.description, 'description');
+  }
+  if (updates.status !== undefined) {
+    toSet.status = normalizeGoalStatus(updates.status, 'status');
+  }
+
+  if (Object.keys(toSet).length === 1) {
+    throw 'No valid fields to update';
+  }
 
   const col = await goalsCollection();
   const result = await col.findOneAndUpdate(
@@ -151,16 +176,33 @@ export const toggleDayCompletion = async (goalId, day) => {
   const col = await goalsCollection();
   const goal = await col.findOne({ _id: new ObjectId(goalId) });
   if (!goal) throw 'Goal not found';
+  const currentStatus = normalizeGoalStatus(goal.status || 'active', 'status');
+  if (currentStatus === 'archived') throw 'Archived goals cannot be updated';
 
-  const completedDays = goal.completedDays || [];
-  const alreadyDone = completedDays.includes(day);
-  const update = alreadyDone
-    ? { $pull: { completedDays: day }, $set: { updatedAt: new Date() } }
-    : { $addToSet: { completedDays: day }, $set: { updatedAt: new Date() } };
+  const completedSet = new Set(Array.isArray(goal.completedDays) ? goal.completedDays : []);
+  if (completedSet.has(day)) completedSet.delete(day);
+  else completedSet.add(day);
+
+  const nextCompletedDays = validDays.filter((validDay) => completedSet.has(validDay));
+  const weeklyPlan = goal.weeklyPlan && typeof goal.weeklyPlan === 'object' ? goal.weeklyPlan : {};
+  const planDays = validDays.filter((validDay) => typeof weeklyPlan[validDay] === 'string' && weeklyPlan[validDay].trim());
+  const daysToCheck = planDays.length ? planDays : validDays;
+  const allDaysCompleted = daysToCheck.every((validDay) => completedSet.has(validDay));
+  const nextStatus = allDaysCompleted
+    ? 'completed'
+    : currentStatus === 'completed'
+      ? 'active'
+      : currentStatus;
 
   const result = await col.findOneAndUpdate(
     { _id: new ObjectId(goalId) },
-    update,
+    {
+      $set: {
+        completedDays: nextCompletedDays,
+        status: nextStatus,
+        updatedAt: new Date()
+      }
+    },
     { returnDocument: 'after' }
   );
   if (!result) throw 'Goal not found';
@@ -193,7 +235,7 @@ function serializeGoal(goal) {
     description: goal.description,
     weeklyPlan: goal.weeklyPlan ?? null,
     completedDays: goal.completedDays ?? [],
-    status: goal.status,
+    status: normalizeGoalStatus(goal.status || 'active', 'status'),
     createdAt: goal.createdAt?.toISOString?.(),
     updatedAt: goal.updatedAt?.toISOString?.()
   };

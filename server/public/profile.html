@@ -6,11 +6,10 @@
     <title>User Profile</title>
     <link rel="stylesheet" href="/styles.css" />
     <style>
-      /* ── Profile-specific styles ── */
       main {
         max-width: 700px;
         margin: 0 auto;
-        padding: 40px 10px 40px 10px;
+        padding: 40px 10px;
       }
 
       .profile-nav {
@@ -65,7 +64,6 @@
         cursor: not-allowed;
       }
 
-      /* Page title row */
       .profile-header {
         margin-bottom: 0;
         padding-bottom: 0;
@@ -79,16 +77,15 @@
       .profile-email {
         font-size: 0.875rem;
         color: #555;
-        margin: 0.3rem 0 0 0;
+        margin: 0.3rem 0 0;
       }
 
       .full-divider {
         border: none;
         border-top: 2px solid var(--outline);
-        margin: 1rem 0 1.5rem 0;
+        margin: 1rem 0 1.5rem;
       }
 
-      /* Info card */
       .card {
         border-radius: 0.75rem;
         padding: 1.5rem;
@@ -98,10 +95,27 @@
 
       .card h2 {
         font-size: 1.5rem;
-        margin: -1rem -1.5rem 1rem -1.5rem;
-        padding: 0.75rem 1.5rem 0.75rem 1.5rem;
+        margin: -1rem -1.5rem 1rem;
+        padding: 0.75rem 1.5rem;
         border-bottom: 2px solid var(--outline);
         border-radius: 0.62rem 0.62rem 0 0;
+      }
+
+      .card-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin: -1rem -1.5rem 1rem;
+        padding: 0.75rem 1.5rem;
+        border-bottom: 2px solid var(--outline);
+        border-radius: 0.62rem 0.62rem 0 0;
+      }
+
+      .card-header-row h2 {
+        margin: 0;
+        padding: 0;
+        border: 0;
       }
 
       .field {
@@ -127,7 +141,23 @@
         font-weight: 500;
       }
 
-      /* Biometrics grid */
+      .account-info-inline {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0.75rem 1.5rem;
+        align-items: baseline;
+        width: 100%;
+      }
+
+      .account-info-inline .field {
+        margin: 0;
+      }
+
+      .account-info-inline .field:last-child {
+        margin-left: auto;
+      }
+
       .biometrics-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -176,27 +206,33 @@
       .error:not(:empty) {
         display: block;
       }
+
       .section-title {
         font-size: 1.1rem;
         margin-bottom: 0.3rem;
       }
-      .form {
+
+      .form,
+      .nutrition-form {
         margin-top: 1rem;
         padding-top: 1rem;
         border-top: 1px dashed rgba(148, 163, 184, 0.35);
       }
+
       .form-row {
         display: flex;
         gap: 0.75rem;
         flex-wrap: wrap;
         margin-top: 0.5rem;
       }
+
       .form-row label {
         display: flex;
         flex-direction: column;
         gap: 0.25rem;
         min-width: 170px;
       }
+
       .form-row input,
       .form-row select,
       .form-row textarea {
@@ -206,10 +242,16 @@
         background: #020617;
         color: #e5e7eb;
       }
+
       .form-row textarea {
         min-height: 84px;
         resize: vertical;
       }
+
+      .nutrition-form textarea {
+        min-height: 110px;
+      }
+
       .save-btn {
         margin-top: 0.9rem;
         padding: 0.5rem 1.1rem;
@@ -220,75 +262,179 @@
         cursor: pointer;
         font-weight: 600;
       }
+
       .save-btn:hover {
         opacity: 0.92;
       }
 
-      .goals-list {
+      .section-action-link,
+      .section-action-btn,
+      .goal-action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        border-radius: 999px;
+        cursor: pointer;
+        font-weight: 700;
+        font-family: inherit;
+        transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
+      }
+
+      .section-action-link,
+      .section-action-btn {
+        padding: 0.42rem 0.9rem;
+        border: 1.5px solid var(--outline);
+        background: rgba(255, 255, 255, 0.4);
+        color: var(--outline);
+        font-size: 0.8rem;
+        text-decoration: none;
+      }
+
+      .section-action-link:hover,
+      .section-action-btn:hover,
+      .goal-action-btn:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.65);
+      }
+
+      .section-action-btn.secondary {
+        background: transparent;
+      }
+
+      .section-action-btn:disabled,
+      .goal-action-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+        transform: none;
+      }
+
+      .goals-list,
+      .nutrition-list {
         display: flex;
         flex-direction: column;
-        gap: 1rem;
-        margin-top: 0.5rem;
+        gap: 0.9rem;
+        margin-top: 0.75rem;
       }
-      .goal-item {
+
+      .goal-item,
+      .nutrition-entry {
         border: 1.5px solid var(--outline);
-        border-radius: 0.65rem;
-        padding: 0.85rem 1rem;
+        border-radius: 0.7rem;
+        padding: 0.95rem 1rem;
         background: rgba(255, 255, 255, 0.45);
       }
-      .goal-item header {
+
+      .goal-item header,
+      .nutrition-entry header {
         display: flex;
         flex-wrap: wrap;
-        align-items: baseline;
+        align-items: center;
         justify-content: space-between;
         gap: 0.5rem;
-        margin-bottom: 0.35rem;
+        margin-bottom: 0.5rem;
       }
-      .goal-item .goal-type {
+
+      .goal-item.completed-goal {
+        border-color: rgba(34, 197, 94, 0.6);
+        background: rgba(34, 197, 94, 0.08);
+      }
+
+      .goal-item.archived-goal {
+        opacity: 0.85;
+        background: rgba(148, 163, 184, 0.14);
+      }
+
+      .goal-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .goal-type {
         font-weight: 700;
         font-size: 1rem;
         color: var(--outline);
         text-transform: capitalize;
       }
-      .goal-item .goal-status {
-        font-size: 0.75rem;
+
+      .goal-status-badge {
+        font-size: 0.72rem;
         text-transform: uppercase;
         letter-spacing: 0.06em;
         padding: 0.2rem 0.55rem;
         border-radius: 999px;
+        border: 1px solid currentColor;
+      }
+
+      .goal-status-badge.active {
+        color: #0f766e;
+        background: rgba(20, 184, 166, 0.12);
+      }
+
+      .goal-status-badge.completed {
+        color: #166534;
+        background: rgba(34, 197, 94, 0.14);
+      }
+
+      .goal-status-badge.archived {
+        color: #475569;
+        background: rgba(148, 163, 184, 0.16);
+      }
+
+      .goal-actions {
+        display: flex;
+        gap: 0.45rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .goal-action-btn {
+        padding: 0.35rem 0.75rem;
         border: 1px solid var(--outline);
-        opacity: 0.85;
-      }
-      .goal-status-select {
-        border: 1px solid var(--outline);;
-        padding: 5px;
-        border-radius: 999px;;
         background: transparent;
-        font-weight: bold;
-        cursor: pointer;    
-        font-size: 0.9rem;
-}
-      .goal-item .goal-status.active {
-        background: rgba(56, 189, 248, 0.2);
+        color: var(--outline);
+        font-size: 0.78rem;
       }
-      .goal-item .goal-dates {
+
+      .goal-action-btn.danger {
+        color: #991b1b;
+        border-color: rgba(153, 27, 27, 0.55);
+      }
+
+      .goal-complete-note {
+        margin-bottom: 0.75rem;
+        padding: 0.6rem 0.8rem;
+        border-radius: 0.55rem;
+        border: 1px solid rgba(34, 197, 94, 0.35);
+        background: rgba(34, 197, 94, 0.12);
+        color: #166534;
+        font-size: 0.82rem;
+      }
+
+      .goal-dates {
         font-size: 0.78rem;
         color: #666;
         margin-bottom: 0.5rem;
       }
-      .goal-item .goal-target {
+
+      .goal-target {
         font-size: 0.9rem;
         margin: 0.25rem 0 0.35rem;
       }
-      .goal-item .goal-desc {
+
+      .goal-desc {
         font-size: 0.88rem;
         color: #444;
         margin-bottom: 0.65rem;
         line-height: 1.45;
       }
+
       .goal-item details {
         margin-top: 0.35rem;
       }
+
       .goal-item summary {
         cursor: pointer;
         font-weight: 600;
@@ -296,11 +442,14 @@
         color: var(--outline);
         user-select: none;
       }
-      .goal-weekly {
+
+      .goal-weekly,
+      .nutrition-meal-list {
         margin-top: 0.5rem;
         display: grid;
-        gap: 0.45rem;
+        gap: 0.5rem;
       }
+
       .goal-day {
         font-size: 0.82rem;
         line-height: 1.4;
@@ -309,6 +458,7 @@
         background: rgba(0, 0, 0, 0.04);
         border-left: 3px solid var(--outline);
       }
+
       .goal-day strong {
         display: block;
         font-size: 0.72rem;
@@ -316,26 +466,166 @@
         opacity: 0.75;
         margin-bottom: 0.15rem;
       }
+
       .goal-day.completed {
         background: rgba(34, 197, 94, 0.12);
         border-left-color: #22c55e;
         opacity: 0.8;
       }
+
       .goal-day.completed .goal-day-body {
         text-decoration: line-through;
         color: #6b7280;
       }
+
+      .goal-day.disabled-goal-day {
+        opacity: 0.7;
+      }
+
+      .goal-day.disabled-goal-day .goal-day-check {
+        cursor: not-allowed;
+      }
+
       .goal-day-header {
         display: flex;
         align-items: center;
         gap: 0.4rem;
       }
+
       .goal-day-check {
         width: 1rem;
         height: 1rem;
         cursor: pointer;
         accent-color: #22c55e;
         flex-shrink: 0;
+      }
+
+      .nutrition-summary {
+        margin-top: 0.2rem;
+        padding: 0.9rem 1rem;
+        border-radius: 0.7rem;
+        border: 1.5px solid var(--outline);
+        background: rgba(255, 255, 255, 0.42);
+        font-size: 0.95rem;
+        line-height: 1.45;
+      }
+
+      .nutrition-summary-value {
+        font-weight: 800;
+        color: #2563eb;
+      }
+
+      .nutrition-form-actions,
+      .json-preview-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+        margin-top: 0.85rem;
+      }
+
+      .nutrition-form-actions .save-btn,
+      .nutrition-form-actions .section-action-btn,
+      .json-preview-actions .save-btn,
+      .json-preview-actions .section-action-btn {
+        margin-top: 0;
+      }
+
+      #cancelNutritionBtn {
+        padding: 0.5rem 1.1rem;
+        color: #111827;
+        background: rgba(255, 255, 255, 0.96);
+        border: 1.5px solid rgba(15, 23, 42, 0.2);
+      }
+
+      #cancelNutritionBtn:hover {
+        background: #ffffff;
+      }
+
+      .json-preview-card {
+        border: 2px solid var(--outline);
+        border-radius: 0.75rem;
+        padding: 0.9rem;
+        margin-top: 1rem;
+        background: rgba(2, 6, 23, 0.9);
+        color: #e5e7eb;
+      }
+
+      .json-preview-card pre {
+        margin: 0.65rem 0 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .json-preview-card code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 0.88rem;
+      }
+
+      .nutrition-entry-title {
+        font-weight: 700;
+        color: var(--outline);
+      }
+
+      .nutrition-entry-calories {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #1d4ed8;
+      }
+
+      .nutrition-entry-side {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+        justify-content: flex-end;
+      }
+
+      .nutrition-entry-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+        align-items: center;
+      }
+
+      .nutrition-entry-meta {
+        font-size: 0.8rem;
+        color: #475569;
+        margin-bottom: 0.5rem;
+      }
+
+      .nutrition-meal {
+        padding: 0.55rem 0.7rem;
+        border-radius: 0.5rem;
+        background: rgba(255, 255, 255, 0.58);
+        border-left: 3px solid #38bdf8;
+      }
+
+      .nutrition-meal-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.4rem;
+        margin-bottom: 0.3rem;
+      }
+
+      .nutrition-meal-type {
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-transform: capitalize;
+        color: var(--outline);
+      }
+
+      .nutrition-meal-calories {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #0f766e;
+      }
+
+      .nutrition-items {
+        font-size: 0.82rem;
+        line-height: 1.45;
+        color: #334155;
       }
     </style>
   </head>
@@ -344,8 +634,6 @@
       <nav class="profile-nav" aria-label="Profile navigation">
         <a href="/" class="nav-pill">Sign Out</a>
         <a href="/create-goal.html" class="nav-pill" id="createGoalLink">Create Goal</a>
-        <!-- We should have this "Create Goal" button instead of a "Generate Workout" button, so the "Talk to AI Agent" button fields general questions,
-        meanwhile the "Create Goal" button can take in a specific user goal, output the necessary workout or diet plan, and save it to profile and DB -->
         <a href="/chat/chat.html" class="nav-pill secondary" id="chatSelfLink">Talk to AI Agent</a>
         <a href="/profile.html" class="nav-pill secondary" id="profileSelfLink">View Profile</a>
         <a class="site-logo-link" data-profile-link href="/profile.html" aria-label="Go to profile">
@@ -357,21 +645,29 @@
 
       <div class="profile-header">
         <h1 id="nameHeading">User Profile</h1>
-        <p class="profile-email" id="emailLine"></p>
       </div>
 
       <hr class="full-divider" />
 
       <div class="card">
         <h2>Account Info</h2>
-        <div class="field">
-          <strong>Joined</strong>
-          <span id="joined">—</span>
+        <div class="account-info-inline">
+          <div class="field">
+            <strong>Joined</strong>
+            <span id="joined">--</span>
+          </div>
+          <div class="field">
+            <strong>Email</strong>
+            <span id="emailLine"></span>
+          </div>
         </div>
       </div>
 
       <div class="card" id="goalsCard">
-        <h2>Goals</h2>
+        <div class="card-header-row">
+          <h2>Goals</h2>
+          <a href="/create-goal.html" class="section-action-link" id="goalsNewGoalLink">New</a>
+        </div>
         <p class="muted" id="goalsEmptyNote">
           No goals saved yet. Use
           <a href="/create-goal.html" id="goalsCreateGoalInlineLink">Create Goal</a>
@@ -380,14 +676,58 @@
         <div class="goals-list" id="goalsContainer"></div>
       </div>
 
+      <div class="card" id="nutritionCard">
+        <div class="card-header-row">
+          <h2>Nutrition</h2>
+          <button class="section-action-btn" id="toggleNutritionAgentBtn" type="button">Talk to AI Agent</button>
+        </div>
+        <div class="nutrition-summary" id="nutritionSummary">
+          Add age, sex, height, weight, and activity level in Biometrics to estimate maintenance calories.
+        </div>
+
+        <div class="nutrition-form" id="nutritionForm" style="display:none;">
+          <div class="form-row">
+            <label>
+              <span class="muted">Date</span>
+              <input type="date" id="nutritionDateInput" />
+            </label>
+          </div>
+          <div class="form-row">
+            <label style="flex: 1 1 100%; min-width: 260px;">
+              <span class="muted">Meals</span>
+              <textarea
+                id="nutritionMealsInput"
+                placeholder="breakfast: yogurt, cheerios with milk, bacon. lunch: mcdonalds hamburger. dinner: chicken and rice."
+              ></textarea>
+            </label>
+          </div>
+          <div class="nutrition-form-actions">
+            <button class="save-btn" id="estimateNutritionBtn" type="button">Estimate Calories</button>
+            <button class="section-action-btn secondary" id="cancelNutritionBtn" type="button">Cancel</button>
+          </div>
+          <div id="nutritionAiMessage" class="muted" style="margin-top: 0.75rem;"></div>
+        </div>
+
+        <div class="json-preview-card" id="nutritionJsonCard" style="display:none;">
+          <strong>Nutrition JSON (ready to save)</strong>
+          <pre><code id="nutritionJsonCode"></code></pre>
+          <div class="json-preview-actions">
+            <button class="save-btn" id="saveNutritionBtn" type="button" disabled>Confirm & Save Day</button>
+            <button class="section-action-btn secondary" id="clearNutritionPreviewBtn" type="button" disabled>Clear</button>
+          </div>
+          <div id="nutritionSaveStatus" class="muted" style="margin-top: 0.75rem;"></div>
+        </div>
+
+        <p class="muted" id="nutritionEmptyNote">No nutrition days saved yet.</p>
+        <div class="nutrition-list" id="nutritionContainer"></div>
+      </div>
+
       <div class="card" id="bioCard">
         <h2>Biometrics</h2>
         <p class="muted" id="bioEmptyNote">No biometrics saved yet.</p>
         <div class="biometrics-grid" id="biometricsGrid"></div>
 
-        <button class="save-btn" id="editBiometricsBtn" type="button">
-          Edit biometrics
-        </button>
+        <button class="save-btn" id="editBiometricsBtn" type="button">Edit biometrics</button>
         <div id="bioSaveStatus" class="error" aria-live="polite" style="display:none; margin-top: 0.75rem;"></div>
 
         <div class="form" id="bioFormSection" style="display:none;">
@@ -448,9 +788,7 @@
             </label>
           </div>
 
-          <button class="save-btn" id="saveBiometricsBtn" type="button">
-            Save biometrics
-          </button>
+          <button class="save-btn" id="saveBiometricsBtn" type="button">Save biometrics</button>
         </div>
       </div>
     </main>
@@ -458,6 +796,19 @@
     <script src="/profileLink.js"></script>
     <script>
       var PROFILE_USER_ID_KEY = 'healthCoachProfileUserId';
+      var ACTIVITY_MULTIPLIERS = {
+        low: 1.2,
+        light: 1.375,
+        moderate: 1.55,
+        active: 1.725,
+        very_active: 1.9
+      };
+
+      var currentUserId = null;
+      var lastNutritionJson = null;
+      var editingNutritionMealId = null;
+      window.__mealLogs = window.__mealLogs || [];
+      window.__lastUserBiometrics = window.__lastUserBiometrics || null;
 
       function redirectToLogin() {
         try {
@@ -484,70 +835,290 @@
 
       function wireNavLinks(userId) {
         var profileLink = document.getElementById('profileSelfLink');
-        var chatLink = document.getElementById('chatSelfLink'); // fixed id
+        var chatLink = document.getElementById('chatSelfLink');
         var createGoalLink = document.getElementById('createGoalLink');
+        var goalsInline = document.getElementById('goalsCreateGoalInlineLink');
+        var goalsNew = document.getElementById('goalsNewGoalLink');
 
         if (userId) {
-          profileLink.href = '/profile.html?id=' + encodeURIComponent(userId);
-          profileLink.hidden = false;
-          profileLink.removeAttribute('aria-disabled');
+          if (profileLink) {
+            profileLink.href = '/profile.html?id=' + encodeURIComponent(userId);
+            profileLink.hidden = false;
+            profileLink.removeAttribute('aria-disabled');
+          }
+          if (chatLink) chatLink.href = '/chat/chat.html?userId=' + encodeURIComponent(userId);
+          if (createGoalLink) createGoalLink.href = '/create-goal.html?userId=' + encodeURIComponent(userId);
+          if (goalsInline) goalsInline.href = '/create-goal.html?userId=' + encodeURIComponent(userId);
+          if (goalsNew) goalsNew.href = '/create-goal.html?userId=' + encodeURIComponent(userId);
+          return;
+        }
 
-          if (chatLink) {
-            chatLink.href = '/chat/chat.html?userId=' + encodeURIComponent(userId);
-          }
-          if (createGoalLink) {
-            createGoalLink.href = '/create-goal.html?userId=' + encodeURIComponent(userId);
-          }
-          var goalsInline = document.getElementById('goalsCreateGoalInlineLink');
-          if (goalsInline) {
-            goalsInline.href = '/create-goal.html?userId=' + encodeURIComponent(userId);
-          }
-        } else {
+        if (profileLink) {
           profileLink.removeAttribute('href');
           profileLink.hidden = true;
           profileLink.setAttribute('aria-disabled', 'true');
+        }
+        if (chatLink) chatLink.href = '/chat/chat.html';
+        if (createGoalLink) createGoalLink.href = '/create-goal.html';
+        if (goalsInline) goalsInline.href = '/create-goal.html';
+        if (goalsNew) goalsNew.href = '/create-goal.html';
+      }
 
-          if (chatLink) {
-            chatLink.href = '/chat/chat.html';
-          }
-          if (createGoalLink) {
-            createGoalLink.href = '/create-goal.html';
-          }
-          var goalsInline = document.getElementById('goalsCreateGoalInlineLink');
-          if (goalsInline) {
-            goalsInline.href = '/create-goal.html';
-          }
+      function getLocalToday() {
+        var now = new Date();
+        var offsetMs = now.getTimezoneOffset() * 60000;
+        return new Date(now.getTime() - offsetMs).toISOString().slice(0, 10);
+      }
+
+      function formatDate(dateString) {
+        if (!dateString) return '--';
+        var raw = String(dateString);
+        var parsed = raw.indexOf('T') !== -1
+          ? new Date(raw)
+          : new Date(raw + 'T00:00:00');
+        if (Number.isNaN(parsed.getTime())) return String(dateString);
+        return parsed.toLocaleDateString(undefined, {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric'
+        });
+      }
+
+      function formatDateTime(dateString) {
+        if (!dateString) return '--';
+        var parsed = new Date(dateString);
+        if (Number.isNaN(parsed.getTime())) return String(dateString);
+        return parsed.toLocaleString();
+      }
+
+      function formatLabel(text) {
+        if (!text) return '';
+        return String(text)
+          .replace(/[_-]+/g, ' ')
+          .replace(/([a-z])([A-Z])/g, '$1 $2')
+          .replace(/\b\w/g, function (char) {
+            return char.toUpperCase();
+          });
+      }
+
+      function normalizeGoalStatus(status) {
+        var normalized = String(status || 'active').toLowerCase();
+        if (normalized === 'complete') return 'completed';
+        if (normalized === 'archive') return 'archived';
+        if (normalized !== 'active' && normalized !== 'completed' && normalized !== 'archived') {
+          return 'active';
+        }
+        return normalized;
+      }
+
+      function getMaintenanceEstimate(biometrics) {
+        var source = biometrics && typeof biometrics === 'object' ? biometrics : {};
+        var missingFields = [];
+
+        var age = Number(source.age);
+        if (!Number.isFinite(age) || age <= 0) missingFields.push('age');
+
+        var sex = typeof source.sex === 'string' ? source.sex.trim().toLowerCase() : '';
+        if (!sex) missingFields.push('sex');
+
+        var heightIn = Number(source.heightIn);
+        if (!Number.isFinite(heightIn) || heightIn <= 0) missingFields.push('height');
+
+        var weightLbs = Number(source.weightLbs);
+        if (!Number.isFinite(weightLbs) || weightLbs <= 0) missingFields.push('weight');
+
+        var activityLevel = source.activityLevel;
+        if (!ACTIVITY_MULTIPLIERS[activityLevel]) missingFields.push('activity level');
+
+        if (missingFields.length) {
+          return { available: false, calories: null, missingFields: missingFields };
+        }
+
+        var weightKg = weightLbs / 2.2046226218;
+        var heightCm = heightIn * 2.54;
+        var sexConstant = sex === 'male' ? 5 : sex === 'female' ? -161 : -78;
+        var bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) + sexConstant;
+
+        return {
+          available: true,
+          calories: Math.round(bmr * ACTIVITY_MULTIPLIERS[activityLevel]),
+          missingFields: []
+        };
+      }
+
+      function setBioSaveStatus(message, isError) {
+        var statusEl = document.getElementById('bioSaveStatus');
+        if (!statusEl) return;
+        if (!message) {
+          statusEl.textContent = '';
+          statusEl.style.display = 'none';
+          statusEl.style.color = '';
+          statusEl.style.border = '';
+          statusEl.style.padding = '';
+          statusEl.style.marginBottom = '';
+          statusEl.style.background = '';
+          return;
+        }
+        statusEl.textContent = message;
+        statusEl.style.display = 'block';
+        if (isError) {
+          statusEl.style.color = '#b91c1c';
+          statusEl.style.border = '1.5px solid #b91c1c';
+          statusEl.style.padding = '0.75rem 1rem';
+          statusEl.style.marginBottom = '1rem';
+          statusEl.style.background = '';
+        } else {
+          statusEl.style.color = '#111827';
+          statusEl.style.border = 'none';
+          statusEl.style.padding = '0';
+          statusEl.style.marginBottom = '0';
+          statusEl.style.background = 'transparent';
         }
       }
 
-      let currentUserId = null;
+      function setNutritionStatus(elementId, message, isError) {
+        var el = document.getElementById(elementId);
+        if (!el) return;
+        el.textContent = message || '';
+        if (isError) {
+          el.style.color = '#fca5a5';
+        } else if (elementId === 'nutritionSaveStatus') {
+          el.style.color = '#bbf7d0';
+        } else {
+          el.style.color = '';
+        }
+      }
+
+      function setNutritionDateDefault() {
+        var input = document.getElementById('nutritionDateInput');
+        if (input && !input.value) {
+          input.value = getLocalToday();
+        }
+      }
+
+      function updateNutritionActionLabels() {
+        var estimateBtn = document.getElementById('estimateNutritionBtn');
+        var saveBtn = document.getElementById('saveNutritionBtn');
+
+        if (estimateBtn) {
+          estimateBtn.textContent = editingNutritionMealId ? 'Re-estimate Day' : 'Estimate Calories';
+        }
+        if (saveBtn) {
+          saveBtn.textContent = editingNutritionMealId ? 'Confirm & Update Day' : 'Confirm & Save Day';
+        }
+      }
+
+      function getNutritionDraftText(log) {
+        if (log && typeof log.description === 'string' && log.description.trim()) {
+          return log.description.trim();
+        }
+        if (log && Array.isArray(log.meals) && log.meals.length) {
+          return log.meals.map(function (meal) {
+            var items = Array.isArray(meal.items) ? meal.items.join(', ') : '';
+            return (meal.mealType || 'meal') + ': ' + items;
+          }).join('. ');
+        }
+        return '';
+      }
+
+      function resetNutritionComposer() {
+        editingNutritionMealId = null;
+        updateNutritionActionLabels();
+
+        var dateInput = document.getElementById('nutritionDateInput');
+        var mealsInput = document.getElementById('nutritionMealsInput');
+        if (dateInput) dateInput.value = getLocalToday();
+        if (mealsInput) mealsInput.value = '';
+
+        hideNutritionJson();
+        hideNutritionForm();
+        setNutritionStatus('nutritionAiMessage', '', false);
+      }
 
       function showBioForm() {
-        const bioFormSection = document.getElementById('bioFormSection');
-        const editBtn = document.getElementById('editBiometricsBtn');
+        var bioFormSection = document.getElementById('bioFormSection');
+        var editBtn = document.getElementById('editBiometricsBtn');
         if (bioFormSection) bioFormSection.style.display = 'block';
         if (editBtn) editBtn.style.display = 'none';
-        const statusEl = document.getElementById('bioSaveStatus');
-        if (statusEl) {
-          statusEl.textContent = '';
-          statusEl.style.display = 'none';
-        }
+        setBioSaveStatus('', false);
       }
 
       function hideBioForm() {
-        const bioFormSection = document.getElementById('bioFormSection');
-        const editBtn = document.getElementById('editBiometricsBtn');
+        var bioFormSection = document.getElementById('bioFormSection');
+        var editBtn = document.getElementById('editBiometricsBtn');
         if (bioFormSection) bioFormSection.style.display = 'none';
         if (editBtn) editBtn.style.display = 'inline-block';
-        const statusEl = document.getElementById('bioSaveStatus');
-        if (statusEl) {
-          statusEl.textContent = '';
-          statusEl.style.display = 'none';
+      }
+
+      function showNutritionForm(log) {
+        var maintenance = getMaintenanceEstimate(window.__lastUserBiometrics || {});
+        if (!maintenance.available) {
+          setNutritionStatus(
+            'nutritionAiMessage',
+            'Add age, sex, height, weight, and activity level in Biometrics before using nutrition estimates.',
+            true
+          );
+          return;
         }
+
+        var form = document.getElementById('nutritionForm');
+        if (form) form.style.display = 'block';
+        if (log && log._id) {
+          editingNutritionMealId = log._id;
+          var dateInput = document.getElementById('nutritionDateInput');
+          var mealsInput = document.getElementById('nutritionMealsInput');
+          if (dateInput) dateInput.value = log.date || getLocalToday();
+          if (mealsInput) mealsInput.value = getNutritionDraftText(log);
+          setNutritionStatus(
+            'nutritionAiMessage',
+            'Editing ' + formatDate(log.date) + '. Update the foods for that day, then re-estimate to save changes.',
+            false
+          );
+          hideNutritionJson();
+        } else if (!editingNutritionMealId) {
+          setNutritionDateDefault();
+          setNutritionStatus('nutritionAiMessage', '', false);
+        }
+        updateNutritionActionLabels();
+        var mealsInput = document.getElementById('nutritionMealsInput');
+        if (mealsInput) mealsInput.focus();
+      }
+
+      function hideNutritionForm() {
+        var form = document.getElementById('nutritionForm');
+        if (form) form.style.display = 'none';
+      }
+
+      function hideNutritionJson() {
+        lastNutritionJson = null;
+        var card = document.getElementById('nutritionJsonCard');
+        var code = document.getElementById('nutritionJsonCode');
+        var saveBtn = document.getElementById('saveNutritionBtn');
+        var clearBtn = document.getElementById('clearNutritionPreviewBtn');
+        if (card) card.style.display = 'none';
+        if (code) code.textContent = '';
+        if (saveBtn) saveBtn.disabled = true;
+        if (clearBtn) clearBtn.disabled = true;
+        setNutritionStatus('nutritionSaveStatus', '', false);
+      }
+
+      function showNutritionJson(nutritionJson) {
+        lastNutritionJson = nutritionJson;
+        var card = document.getElementById('nutritionJsonCard');
+        var code = document.getElementById('nutritionJsonCode');
+        var saveBtn = document.getElementById('saveNutritionBtn');
+        var clearBtn = document.getElementById('clearNutritionPreviewBtn');
+        if (card) card.style.display = 'block';
+        if (code) code.textContent = JSON.stringify(nutritionJson, null, 2);
+        if (saveBtn) saveBtn.disabled = false;
+        if (clearBtn) clearBtn.disabled = false;
+        requestAnimationFrame(function () {
+          if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
       }
 
       async function fetchUser(id) {
-        const res = await fetch('/users/' + encodeURIComponent(id), {
+        var res = await fetch('/users/' + encodeURIComponent(id), {
           credentials: 'same-origin'
         });
 
@@ -556,13 +1127,10 @@
           throw new Error('Unauthorized');
         }
 
-        const contentType = res.headers.get('content-type') || '';
-
+        var contentType = res.headers.get('content-type') || '';
         if (!res.ok) {
-          const text = await res.text();
-          throw new Error(text || 'Request failed with ' + res.status);
+          throw new Error((await res.text()) || 'Request failed with ' + res.status);
         }
-
         if (!contentType.includes('application/json')) {
           redirectToLogin();
           throw new Error('Expected JSON response but received something else.');
@@ -571,32 +1139,127 @@
         return res.json();
       }
 
-      function escapeHtml(s) {
-        if (s === null || s === undefined) return '';
-        return String(s)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
+      async function fetchGoals(userId) {
+        var res = await fetch('/goals/user/' + encodeURIComponent(userId), {
+          credentials: 'same-origin'
+        });
+
+        if (res.status === 401 || res.status === 403) {
+          redirectToLogin();
+          throw new Error('Unauthorized');
+        }
+        if (!res.ok) {
+          throw new Error((await res.text()) || 'Request failed with ' + res.status);
+        }
+        return res.json();
+      }
+
+      async function fetchMeals(userId) {
+        var res = await fetch('/users/' + encodeURIComponent(userId) + '/meals', {
+          credentials: 'same-origin'
+        });
+
+        if (res.status === 401 || res.status === 403) {
+          redirectToLogin();
+          throw new Error('Unauthorized');
+        }
+        if (!res.ok) {
+          throw new Error((await res.text()) || 'Request failed with ' + res.status);
+        }
+        return res.json();
+      }
+
+      async function refreshGoals() {
+        if (!currentUserId) return;
+        renderGoals(await fetchGoals(currentUserId));
+      }
+
+      async function refreshNutrition() {
+        if (!currentUserId) return;
+        renderNutrition(await fetchMeals(currentUserId), window.__lastUserBiometrics || null);
+      }
+
+      async function updateSavedMeal(mealId, meal) {
+        var response = await fetch('/users/' + encodeURIComponent(currentUserId) + '/meals/' + encodeURIComponent(mealId), {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify(meal)
+        });
+        var data = await response.json().catch(function () {
+          return null;
+        });
+        if (!response.ok) {
+          throw new Error((data && data.error) || 'Unable to update nutrition day.');
+        }
+        return data;
+      }
+
+      async function deleteSavedMeal(mealId) {
+        var response = await fetch('/users/' + encodeURIComponent(currentUserId) + '/meals/' + encodeURIComponent(mealId), {
+          method: 'DELETE',
+          credentials: 'same-origin'
+        });
+        var data = await response.json().catch(function () {
+          return null;
+        });
+        if (!response.ok) {
+          throw new Error((data && data.error) || 'Unable to delete nutrition day.');
+        }
+        return data;
+      }
+
+      async function updateGoalStatus(goalId, nextStatus) {
+        var response = await fetch('/goals/' + encodeURIComponent(goalId), {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ status: nextStatus })
+        });
+        var data = await response.json().catch(function () {
+          return null;
+        });
+        if (!response.ok) {
+          throw new Error((data && data.error) || 'Failed to update goal');
+        }
+        return data;
+      }
+
+      async function deleteGoal(goalId) {
+        var response = await fetch('/goals/' + encodeURIComponent(goalId), {
+          method: 'DELETE',
+          credentials: 'same-origin'
+        });
+        var data = await response.json().catch(function () {
+          return null;
+        });
+        if (!response.ok) {
+          throw new Error((data && data.error) || 'Failed to delete goal');
+        }
+        return data;
       }
 
       async function handleDayToggle(event) {
         var checkbox = event.target;
         var dayEl = checkbox.closest('.goal-day');
         if (!dayEl) return;
+
         var goalId = dayEl.getAttribute('data-goal-id');
         var day = dayEl.getAttribute('data-day');
         checkbox.disabled = true;
+
         try {
           var res = await fetch('/goals/' + encodeURIComponent(goalId) + '/days/' + encodeURIComponent(day) + '/toggle', {
             method: 'PATCH',
             credentials: 'same-origin'
           });
-          if (!res.ok) throw new Error('Request failed');
-          var updated = await res.json();
-          var done = Array.isArray(updated.completedDays) && updated.completedDays.includes(day);
-          dayEl.classList.toggle('completed', done);
-          checkbox.checked = done;
+          var data = await res.json().catch(function () {
+            return null;
+          });
+          if (!res.ok) {
+            throw new Error((data && data.error) || 'Failed to update goal progress');
+          }
+          await refreshGoals();
         } catch (e) {
           checkbox.checked = !checkbox.checked;
         } finally {
@@ -604,24 +1267,18 @@
         }
       }
 
-      async function fetchGoals(userId) {
-        const res = await fetch('/goals/user/' + encodeURIComponent(userId), {
-          credentials: 'same-origin'
-        });
-        if (res.status === 401 || res.status === 403) {
-          redirectToLogin();
-          throw new Error('Unauthorized');
-        }
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(text || 'Request failed with ' + res.status);
-        }
-        return res.json();
+      function buildGoalActionButton(label, className, onClick) {
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'goal-action-btn' + (className ? ' ' + className : '');
+        button.textContent = label;
+        button.addEventListener('click', onClick);
+        return button;
       }
 
       function renderGoals(goals) {
-        const empty = document.getElementById('goalsEmptyNote');
-        const container = document.getElementById('goalsContainer');
+        var empty = document.getElementById('goalsEmptyNote');
+        var container = document.getElementById('goalsContainer');
         if (!empty || !container) return;
 
         container.innerHTML = '';
@@ -631,80 +1288,107 @@
         }
 
         empty.style.display = 'none';
+        var dayOrder = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
-        const dayOrder = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-
-        for (var i = 0; i < goals.length; i++) {
-          var g = goals[i];
-          var weekly = g.weeklyPlan || g.plan || null;
+        goals.forEach(function (goal) {
+          var weeklyPlan = goal.weeklyPlan || goal.plan || null;
+          var status = normalizeGoalStatus(goal.status);
+          var completedDays = Array.isArray(goal.completedDays) ? goal.completedDays : [];
           var article = document.createElement('article');
-          article.className = 'goal-item';
-          article.setAttribute('data-goal-id', g._id || '');
-
-          var status = (g.status || 'active').toLowerCase();
-          var created = g.createdAt ? new Date(g.createdAt).toLocaleString() : '—';
-          var updated = g.updatedAt ? new Date(g.updatedAt).toLocaleString() : '—';
+          article.className = 'goal-item ' + (status === 'completed' ? 'completed-goal' : status === 'archived' ? 'archived-goal' : '');
+          article.setAttribute('data-goal-id', goal._id || '');
 
           var header = document.createElement('header');
+          var meta = document.createElement('div');
+          meta.className = 'goal-meta';
+
           var typeSpan = document.createElement('span');
           typeSpan.className = 'goal-type';
-          typeSpan.textContent = g.type || 'Goal';
-          //var statusSpan = document.createElement('span');
-          //statusSpan.className = 'goal-status' + (status === 'active' ? ' active' : '');
-          //statusSpan.textContent = g.status || 'active';
-          header.appendChild(typeSpan);
-          //header.appendChild(statusSpan);
+          typeSpan.textContent = goal.type || 'Goal';
+
+          var statusBadge = document.createElement('span');
+          statusBadge.className = 'goal-status-badge ' + status;
+          statusBadge.textContent = formatLabel(status);
+
+          meta.appendChild(typeSpan);
+          meta.appendChild(statusBadge);
+
+          var actions = document.createElement('div');
+          actions.className = 'goal-actions';
+
+          if (status === 'archived') {
+            actions.appendChild(
+              buildGoalActionButton('Restore', '', async function () {
+                try {
+                  await updateGoalStatus(goal._id, 'active');
+                  await refreshGoals();
+                } catch (e) {
+                  window.alert(e.message || 'Unable to restore this goal.');
+                }
+              })
+            );
+          } else {
+            actions.appendChild(
+              buildGoalActionButton('Archive', '', async function () {
+                try {
+                  await updateGoalStatus(goal._id, 'archived');
+                  await refreshGoals();
+                } catch (e) {
+                  window.alert(e.message || 'Unable to archive this goal.');
+                }
+              })
+            );
+          }
+
+          actions.appendChild(
+            buildGoalActionButton('Delete', 'danger', async function () {
+              if (!window.confirm('Delete this goal permanently?')) return;
+              try {
+                await deleteGoal(goal._id);
+                await refreshGoals();
+              } catch (e) {
+                window.alert(e.message || 'Unable to delete this goal.');
+              }
+            })
+          );
+
+          header.appendChild(meta);
+          header.appendChild(actions);
           article.appendChild(header);
 
-          var statusSelect = document.createElement('select');
-          statusSelect.className = "goal-status-select";
-
-          ['active', 'complete', 'archive'].forEach(function(option) {
-            var opt = document.createElement('option');
-            opt.value = option;
-            opt.textContent = option.charAt(0).toUpperCase() + option.slice(1); // UI label
-            if(option === status) opt.selected = true;
-            statusSelect.appendChild(opt);
-          });
-          statusSelect.addEventListener('change', async function(){
-            const newStatus = this.value;
-            const goalId = this.g._id;
-
-            try{
-              const response = await fetch(`/goals/${goalId}`,{
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: newStatus})
-              });
-              if(!response.ok) throw new Error ('Failed to update');
-              console.log('Status updated to', newStatus);
-            }catch (e){
-              alert('Failed to update status');
-            }
-          })
-          header.appendChild(statusSelect);
+          if (status === 'completed') {
+            var completeNote = document.createElement('div');
+            completeNote.className = 'goal-complete-note';
+            completeNote.textContent = 'All items in this goal are checked off. Archive it or delete it whenever you are ready.';
+            article.appendChild(completeNote);
+          }
 
           var dates = document.createElement('div');
           dates.className = 'goal-dates';
-          dates.textContent = 'Created ' + created + ' · Updated ' + updated;
+          dates.textContent = 'Created ' + formatDateTime(goal.createdAt) + ' - Updated ' + formatDateTime(goal.updatedAt);
           article.appendChild(dates);
 
-          if (g.target) {
+          if (goal.target) {
             var targetP = document.createElement('p');
             targetP.className = 'goal-target';
-            targetP.innerHTML = '<strong>Target:</strong> ' + escapeHtml(g.target);
+            var strong = document.createElement('strong');
+            strong.textContent = 'Target: ';
+            targetP.appendChild(strong);
+            targetP.appendChild(document.createTextNode(goal.target));
             article.appendChild(targetP);
           }
 
-          if (g.description) {
+          if (goal.description) {
             var descP = document.createElement('p');
             descP.className = 'goal-desc';
-            descP.textContent = g.description;
+            descP.textContent = goal.description;
             article.appendChild(descP);
           }
 
-          if (weekly && typeof weekly === 'object') {
+          if (weeklyPlan && typeof weeklyPlan === 'object') {
             var details = document.createElement('details');
+            if (status !== 'archived') details.open = true;
+
             var summary = document.createElement('summary');
             summary.textContent = 'Weekly plan';
             details.appendChild(summary);
@@ -712,17 +1396,15 @@
             var wrap = document.createElement('div');
             wrap.className = 'goal-weekly';
 
-            var completedDays = Array.isArray(g.completedDays) ? g.completedDays : [];
+            dayOrder.forEach(function (day) {
+              var value = weeklyPlan[day];
+              if (value === undefined || value === null || value === '') return;
 
-            for (var d = 0; d < dayOrder.length; d++) {
-              var key = dayOrder[d];
-              var val = weekly[key];
-              if (val === undefined || val === null || val === '') continue;
-              var isDone = completedDays.includes(key);
+              var isDone = completedDays.includes(day);
               var dayEl = document.createElement('div');
-              dayEl.className = 'goal-day' + (isDone ? ' completed' : '');
-              dayEl.setAttribute('data-goal-id', g._id || '');
-              dayEl.setAttribute('data-day', key);
+              dayEl.className = 'goal-day' + (isDone ? ' completed' : '') + (status === 'archived' ? ' disabled-goal-day' : '');
+              dayEl.setAttribute('data-goal-id', goal._id || '');
+              dayEl.setAttribute('data-day', day);
 
               var dayHeader = document.createElement('div');
               dayHeader.className = 'goal-day-header';
@@ -731,103 +1413,263 @@
               checkbox.type = 'checkbox';
               checkbox.className = 'goal-day-check';
               checkbox.checked = isDone;
-              checkbox.setAttribute('aria-label', 'Mark ' + key + ' as completed');
+              checkbox.disabled = status === 'archived';
+              checkbox.setAttribute('aria-label', 'Mark ' + day + ' as completed');
               checkbox.addEventListener('change', handleDayToggle);
 
-              var strong = document.createElement('strong');
-              strong.textContent = key;
-              dayHeader.appendChild(checkbox);
-              dayHeader.appendChild(strong);
-              dayEl.appendChild(dayHeader);
+              var dayLabel = document.createElement('strong');
+              dayLabel.textContent = day;
 
               var body = document.createElement('div');
               body.className = 'goal-day-body';
               body.style.whiteSpace = 'pre-wrap';
-              body.textContent = String(val);
+              body.textContent = String(value);
+
+              dayHeader.appendChild(checkbox);
+              dayHeader.appendChild(dayLabel);
+              dayEl.appendChild(dayHeader);
               dayEl.appendChild(body);
               wrap.appendChild(dayEl);
-            }
+            });
 
             details.appendChild(wrap);
             article.appendChild(details);
           }
 
           container.appendChild(article);
+        });
+      }
+
+      function buildNutritionActionButton(label, className, onClick) {
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'goal-action-btn' + (className ? ' ' + className : '');
+        button.textContent = label;
+        button.addEventListener('click', onClick);
+        return button;
+      }
+
+      function startNutritionEdit(log) {
+        showNutritionForm(log);
+      }
+
+      async function handleNutritionDelete(log) {
+        if (!log || !log._id) return;
+        if (!window.confirm('Delete this nutrition day?')) return;
+
+        try {
+          await deleteSavedMeal(log._id);
+          if (editingNutritionMealId === log._id) {
+            resetNutritionComposer();
+          }
+          await refreshNutrition();
+        } catch (e) {
+          window.alert(e.message || 'Unable to delete this nutrition day.');
         }
       }
 
+      function renderNutrition(mealLogs, biometrics) {
+        window.__mealLogs = Array.isArray(mealLogs) ? mealLogs : [];
+
+        var summaryEl = document.getElementById('nutritionSummary');
+        var emptyEl = document.getElementById('nutritionEmptyNote');
+        var container = document.getElementById('nutritionContainer');
+        var estimateBtn = document.getElementById('estimateNutritionBtn');
+        if (!summaryEl || !emptyEl || !container) return;
+
+        var maintenance = getMaintenanceEstimate(biometrics || {});
+        if (maintenance.available) {
+          summaryEl.innerHTML = 'Estimated maintenance: <span class="nutrition-summary-value">' + maintenance.calories.toLocaleString() + ' calories/day</span> based on your biometrics and activity level.';
+        } else {
+          summaryEl.textContent = 'Add ' + maintenance.missingFields.join(', ') + ' in Biometrics to estimate maintenance calories.';
+        }
+        if (estimateBtn) estimateBtn.disabled = !maintenance.available;
+
+        container.innerHTML = '';
+        if (!window.__mealLogs.length) {
+          emptyEl.style.display = 'block';
+          return;
+        }
+
+        emptyEl.style.display = 'none';
+        var sortedLogs = window.__mealLogs.slice().sort(function (a, b) {
+          return String(b.date || '').localeCompare(String(a.date || ''));
+        });
+
+        sortedLogs.forEach(function (log) {
+          var entry = document.createElement('article');
+          entry.className = 'nutrition-entry';
+
+          var header = document.createElement('header');
+          var title = document.createElement('div');
+          title.className = 'nutrition-entry-title';
+          title.textContent = formatDate(log.date);
+
+          var calories = document.createElement('div');
+          calories.className = 'nutrition-entry-calories';
+          if (Number.isFinite(Number(log.calories))) {
+            calories.textContent = Math.round(Number(log.calories)).toLocaleString() + ' cal total';
+          } else {
+            calories.textContent = 'Calories not set';
+          }
+
+          var side = document.createElement('div');
+          side.className = 'nutrition-entry-side';
+          side.appendChild(calories);
+
+          if (log._id) {
+            var actions = document.createElement('div');
+            actions.className = 'nutrition-entry-actions';
+            actions.appendChild(
+              buildNutritionActionButton('Edit', '', function () {
+                startNutritionEdit(log);
+              })
+            );
+            actions.appendChild(
+              buildNutritionActionButton('Delete', 'danger', function () {
+                handleNutritionDelete(log);
+              })
+            );
+            side.appendChild(actions);
+          }
+
+          header.appendChild(title);
+          header.appendChild(side);
+          entry.appendChild(header);
+
+          if (Number.isFinite(Number(log.maintenanceCalories))) {
+            var delta = Number(log.calorieDelta);
+            var meta = document.createElement('div');
+            meta.className = 'nutrition-entry-meta';
+            var deltaText = delta === 0
+              ? 'Right at maintenance'
+              : Math.abs(delta).toLocaleString() + ' cal ' + (delta > 0 ? 'over' : 'under') + ' maintenance';
+            meta.textContent = 'Maintenance ' + Math.round(Number(log.maintenanceCalories)).toLocaleString() + ' cal/day - ' + deltaText;
+            entry.appendChild(meta);
+          }
+
+          if (Array.isArray(log.meals) && log.meals.length) {
+            var mealList = document.createElement('div');
+            mealList.className = 'nutrition-meal-list';
+
+            log.meals.forEach(function (meal) {
+              var mealCard = document.createElement('div');
+              mealCard.className = 'nutrition-meal';
+
+              var mealHeader = document.createElement('div');
+              mealHeader.className = 'nutrition-meal-header';
+
+              var mealType = document.createElement('div');
+              mealType.className = 'nutrition-meal-type';
+              mealType.textContent = formatLabel(meal.mealType || 'meal');
+
+              var mealCalories = document.createElement('div');
+              mealCalories.className = 'nutrition-meal-calories';
+              mealCalories.textContent = Number.isFinite(Number(meal.estimatedCalories))
+                ? Math.round(Number(meal.estimatedCalories)).toLocaleString() + ' cal'
+                : 'Estimate unavailable';
+
+              var mealItems = document.createElement('div');
+              mealItems.className = 'nutrition-items';
+              mealItems.textContent = Array.isArray(meal.items) ? meal.items.join(', ') : (meal.description || '');
+
+              mealHeader.appendChild(mealType);
+              mealHeader.appendChild(mealCalories);
+              mealCard.appendChild(mealHeader);
+              mealCard.appendChild(mealItems);
+              mealList.appendChild(mealCard);
+            });
+
+            entry.appendChild(mealList);
+          } else {
+            var genericMeal = document.createElement('div');
+            genericMeal.className = 'nutrition-items';
+            genericMeal.textContent = formatLabel(log.mealType || 'meal') + ': ' + (log.description || '');
+            entry.appendChild(genericMeal);
+          }
+
+          if (log.notes) {
+            var notes = document.createElement('p');
+            notes.className = 'muted';
+            notes.textContent = log.notes;
+            entry.appendChild(notes);
+          }
+
+          container.appendChild(entry);
+        });
+      }
+
       function renderProfile(user) {
-        currentUserId = user?._id ? user._id : currentUserId;
+        currentUserId = user && user._id ? user._id : currentUserId;
+        window.__lastUserBiometrics = user && user.biometrics ? user.biometrics : null;
 
         hideBioForm();
 
-        const nameHeading = document.getElementById('nameHeading');
-        const emailLine = document.getElementById('emailLine');
-        const joinedEl = document.getElementById('joined');
-        const bioEmptyNote = document.getElementById('bioEmptyNote');
-        const bioGrid = document.getElementById('biometricsGrid');
+        var nameHeading = document.getElementById('nameHeading');
+        var emailLine = document.getElementById('emailLine');
+        var joinedEl = document.getElementById('joined');
+        var bioEmptyNote = document.getElementById('bioEmptyNote');
+        var bioGrid = document.getElementById('biometricsGrid');
 
-        nameHeading.textContent = user.name || 'User profile';
-        emailLine.textContent = user.email ? 'Email: ' + user.email : '';
+        if (nameHeading) nameHeading.textContent = user.name || 'User profile';
+        if (emailLine) emailLine.textContent = user.email ? 'Email: ' + user.email : '';
+        if (joinedEl) joinedEl.textContent = user.dateJoined ? formatDate(user.dateJoined) : '--';
 
-        if (user.dateJoined) {
-          const d = new Date(user.dateJoined);
-          joinedEl.textContent = d.toLocaleDateString();
-        } else {
-          joinedEl.textContent = '—';
+        if (!bioGrid || !bioEmptyNote) {
+          renderNutrition(window.__mealLogs || [], window.__lastUserBiometrics || null);
+          return;
         }
 
         bioGrid.innerHTML = '';
         if (!user.biometrics) {
+          clearBiometricsForm();
           bioEmptyNote.style.display = 'block';
         } else {
           bioEmptyNote.style.display = 'none';
           prefillBiometricsForm(user.biometrics);
 
-          const entries = Object.entries(user.biometrics);
-          for (const [key, value] of entries) {
-            if (value === null || value === undefined || value === '') continue;
-            const item = document.createElement('div');
-            item.className = 'field';
-            const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
-            let display = value;
+          Object.entries(user.biometrics).forEach(function (entry) {
+            var key = entry[0];
+            var value = entry[1];
+            if (value === null || value === undefined || value === '') return;
 
+            var item = document.createElement('div');
+            item.className = 'bio-item';
+
+            var label = document.createElement('strong');
+            label.textContent = formatLabel(key);
+
+            var display = value;
             if (Array.isArray(value)) {
               display = value.join(', ');
             } else if (typeof value === 'object') {
-              display = Object.entries(value)
-                .filter(([, v]) => v)
-                .map(([k]) => k)
-                .join(', ');
+              display = Object.keys(value).filter(function (innerKey) {
+                return value[innerKey];
+              }).map(formatLabel).join(', ');
             }
 
-            item.innerHTML = '<strong>' + label + ':</strong> <span>' + display + '</span>';
-            bioGrid.appendChild(item);
-          }
-        }
-      }
+            var valueEl = document.createElement('span');
+            valueEl.textContent = String(display);
 
-      function setBioSaveStatus(message, isError) {
-        const statusEl = document.getElementById('bioSaveStatus');
-        if (!message) {
-          statusEl.textContent = '';
-          statusEl.style.display = 'none';
-          return;
+            item.appendChild(label);
+            item.appendChild(valueEl);
+            bioGrid.appendChild(item);
+          });
         }
-        statusEl.textContent = message;
-        statusEl.style.display = 'block';
-        statusEl.style.color = isError ? '#fecaca' : '#bbf7d0';
+
+        renderNutrition(window.__mealLogs || [], window.__lastUserBiometrics || null);
       }
 
       function clearBiometricsForm() {
-        const ageInput = document.getElementById('ageInput');
-        const sexSelect = document.getElementById('sexSelect');
-        const heightInInput = document.getElementById('heightInInput');
-        const weightLbsInput = document.getElementById('weightLbsInput');
-        const activityLevelSelect = document.getElementById('activityLevelSelect');
-        const medicalConditionsInput = document.getElementById('medicalConditionsInput');
-        const dietaryPreferencesInput = document.getElementById('dietaryPreferencesInput');
-        const injuriesOrLimitationsInput = document.getElementById('injuriesOrLimitationsInput');
+        var ageInput = document.getElementById('ageInput');
+        var sexSelect = document.getElementById('sexSelect');
+        var heightInInput = document.getElementById('heightInInput');
+        var weightLbsInput = document.getElementById('weightLbsInput');
+        var activityLevelSelect = document.getElementById('activityLevelSelect');
+        var medicalConditionsInput = document.getElementById('medicalConditionsInput');
+        var dietaryPreferencesInput = document.getElementById('dietaryPreferencesInput');
+        var injuriesOrLimitationsInput = document.getElementById('injuriesOrLimitationsInput');
+
         if (ageInput) ageInput.value = '';
         if (sexSelect) sexSelect.value = '';
         if (heightInInput) heightInInput.value = '';
@@ -843,21 +1685,21 @@
           clearBiometricsForm();
           return;
         }
-        const ageInput = document.getElementById('ageInput');
-        const sexSelect = document.getElementById('sexSelect');
-        const heightInInput = document.getElementById('heightInInput');
-        const weightLbsInput = document.getElementById('weightLbsInput');
-        const activityLevelSelect = document.getElementById('activityLevelSelect');
-        const medicalConditionsInput = document.getElementById('medicalConditionsInput');
-        const dietaryPreferencesInput = document.getElementById('dietaryPreferencesInput');
-        const injuriesOrLimitationsInput = document.getElementById('injuriesOrLimitationsInput');
+
+        var ageInput = document.getElementById('ageInput');
+        var sexSelect = document.getElementById('sexSelect');
+        var heightInInput = document.getElementById('heightInInput');
+        var weightLbsInput = document.getElementById('weightLbsInput');
+        var activityLevelSelect = document.getElementById('activityLevelSelect');
+        var medicalConditionsInput = document.getElementById('medicalConditionsInput');
+        var dietaryPreferencesInput = document.getElementById('dietaryPreferencesInput');
+        var injuriesOrLimitationsInput = document.getElementById('injuriesOrLimitationsInput');
 
         if (ageInput) ageInput.value = biometrics.age ?? '';
         if (sexSelect) sexSelect.value = biometrics.sex ?? '';
         if (heightInInput) heightInInput.value = biometrics.heightIn ?? '';
         if (weightLbsInput) weightLbsInput.value = biometrics.weightLbs ?? '';
         if (activityLevelSelect) activityLevelSelect.value = biometrics.activityLevel ?? '';
-
         if (medicalConditionsInput) {
           medicalConditionsInput.value = Array.isArray(biometrics.medicalConditions)
             ? biometrics.medicalConditions.join(', ')
@@ -876,48 +1718,43 @@
       }
 
       async function saveBiometrics() {
-        const errorEl = document.getElementById('bioSaveStatus');
-        if (errorEl) {
-          errorEl.textContent = '';
-          errorEl.style.display = 'none';
-        }
+        setBioSaveStatus('', false);
 
-        const userId = currentUserId;
+        var userId = currentUserId;
         if (!userId) {
           setBioSaveStatus('No user loaded. Please log in first.', true);
           return;
         }
 
-        const ageRaw = document.getElementById('ageInput').value;
-        const sex = document.getElementById('sexSelect').value;
-        const heightInRaw = document.getElementById('heightInInput').value;
-        const weightLbsRaw = document.getElementById('weightLbsInput').value;
-        const activityLevel = document.getElementById('activityLevelSelect').value;
-        const medicalConditionsRaw = document.getElementById('medicalConditionsInput').value;
-        const dietaryPreferencesRaw = document.getElementById('dietaryPreferencesInput').value;
-        const injuriesOrLimitationsRaw = document.getElementById('injuriesOrLimitationsInput').value;
+        var ageRaw = document.getElementById('ageInput').value;
+        var sex = document.getElementById('sexSelect').value;
+        var heightInRaw = document.getElementById('heightInInput').value;
+        var weightLbsRaw = document.getElementById('weightLbsInput').value;
+        var activityLevel = document.getElementById('activityLevelSelect').value;
+        var medicalConditionsRaw = document.getElementById('medicalConditionsInput').value;
+        var dietaryPreferencesRaw = document.getElementById('dietaryPreferencesInput').value;
+        var injuriesOrLimitationsRaw = document.getElementById('injuriesOrLimitationsInput').value;
 
         if (!sex) {
           setBioSaveStatus('Please select a sex value.', true);
           return;
         }
 
-        const next = { ...(window.__lastUserBiometrics || {}) };
-        next.sex = sex;
-
         function parseStringList(raw) {
           if (raw === null || raw === undefined) return undefined;
-          const s = String(raw).trim();
+          var s = String(raw).trim();
           if (!s) return undefined;
-          const parts = s
-            .split(',')
-            .map((p) => p.trim())
-            .filter(Boolean);
+          var parts = s.split(',').map(function (part) {
+            return part.trim();
+          }).filter(Boolean);
           return parts.length ? parts : undefined;
         }
 
+        var next = Object.assign({}, window.__lastUserBiometrics || {});
+        next.sex = sex;
+
         if (ageRaw !== '') {
-          const age = Number(ageRaw);
+          var age = Number(ageRaw);
           if (!Number.isFinite(age) || age < 0) {
             setBioSaveStatus('Age must be 0 or greater.', true);
             return;
@@ -926,7 +1763,7 @@
         }
 
         if (heightInRaw !== '') {
-          const heightIn = Number(heightInRaw);
+          var heightIn = Number(heightInRaw);
           if (!Number.isFinite(heightIn) || heightIn <= 0) {
             setBioSaveStatus('Height must be greater than 0.', true);
             return;
@@ -935,7 +1772,7 @@
         }
 
         if (weightLbsRaw !== '') {
-          const weightLbs = Number(weightLbsRaw);
+          var weightLbs = Number(weightLbsRaw);
           if (!Number.isFinite(weightLbs) || weightLbs <= 0) {
             setBioSaveStatus('Weight must be greater than 0.', true);
             return;
@@ -943,28 +1780,25 @@
           next.weightLbs = weightLbs;
         }
 
-        if (activityLevel) {
-          next.activityLevel = activityLevel;
-        } else {
-          delete next.activityLevel;
-        }
+        if (activityLevel) next.activityLevel = activityLevel;
+        else delete next.activityLevel;
 
-        const medicalConditions = parseStringList(medicalConditionsRaw);
+        var medicalConditions = parseStringList(medicalConditionsRaw);
         if (medicalConditions !== undefined) next.medicalConditions = medicalConditions;
         else delete next.medicalConditions;
 
-        const dietaryPreferences = parseStringList(dietaryPreferencesRaw);
+        var dietaryPreferences = parseStringList(dietaryPreferencesRaw);
         if (dietaryPreferences !== undefined) next.dietaryPreferences = dietaryPreferences;
         else delete next.dietaryPreferences;
 
-        const injuriesOrLimitations = parseStringList(injuriesOrLimitationsRaw);
+        var injuriesOrLimitations = parseStringList(injuriesOrLimitationsRaw);
         if (injuriesOrLimitations !== undefined) next.injuriesOrLimitations = injuriesOrLimitations;
         else delete next.injuriesOrLimitations;
 
         try {
           setBioSaveStatus('Saving...', false);
 
-          const res = await fetch('/users/' + encodeURIComponent(userId) + '/biometrics', {
+          var res = await fetch('/users/' + encodeURIComponent(userId) + '/biometrics', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'same-origin',
@@ -975,21 +1809,20 @@
             redirectToLogin();
             return;
           }
-
-          const text = await res.text();
           if (!res.ok) {
-            throw new Error(text || `Save failed with status ${res.status}`);
+            throw new Error((await res.text()) || 'Save failed with status ' + res.status);
           }
 
-          const refreshed = await fetchUser(userId);
-          window.__lastUserBiometrics = refreshed?.biometrics || null;
+          var refreshed = await fetchUser(userId);
           renderProfile(refreshed);
-          try {
-            const goals = await fetchGoals(userId);
-            renderGoals(goals);
-          } catch (e) {
-            /* ignore goals refresh errors */
-          }
+
+          var results = await Promise.all([
+            fetchGoals(userId).catch(function () { return []; }),
+            fetchMeals(userId).catch(function () { return window.__mealLogs || []; })
+          ]);
+
+          renderGoals(results[0]);
+          renderNutrition(results[1], refreshed && refreshed.biometrics ? refreshed.biometrics : null);
           setBioSaveStatus('Saved biometrics successfully.', false);
           hideBioForm();
         } catch (err) {
@@ -999,67 +1832,169 @@
         }
       }
 
-      async function loadFromInput() {
-        const id = document.getElementById('userIdInput').value.trim();
-        const errorEl = document.getElementById('error');
-        errorEl.textContent = '';
-
-        if (!id) {
-          errorEl.textContent = 'Please enter a user id.';
+      async function estimateNutrition() {
+        if (!currentUserId) {
+          setNutritionStatus('nutritionAiMessage', 'No user loaded. Please log in first.', true);
           return;
         }
 
+        var dateInput = document.getElementById('nutritionDateInput');
+        var mealsInput = document.getElementById('nutritionMealsInput');
+        var estimateBtn = document.getElementById('estimateNutritionBtn');
+        var date = dateInput ? dateInput.value : '';
+        var message = mealsInput ? mealsInput.value.trim() : '';
+
+        if (!date) {
+          setNutritionStatus('nutritionAiMessage', 'Please choose a date for this nutrition log.', true);
+          return;
+        }
+        if (!message) {
+          setNutritionStatus('nutritionAiMessage', 'Please enter the meals you want estimated.', true);
+          return;
+        }
+
+        hideNutritionJson();
+        setNutritionStatus('nutritionAiMessage', 'Estimating calories...', false);
+        if (estimateBtn) estimateBtn.disabled = true;
+
         try {
-          currentUserId = id;
-          const user = await fetchUser(id);
-          window.__lastUserBiometrics = user?.biometrics || null;
-          renderProfile(user);
-          const goals = await fetchGoals(id);
-          renderGoals(goals);
-        } catch (err) {
-          if (err.message !== 'Unauthorized') {
-            errorEl.textContent = 'Could not load user: ' + err.message;
+          var response = await fetch('/api/health-coach/estimate-nutrition', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+              userId: currentUserId,
+              date: date,
+              message: message
+            })
+          });
+
+          var data = await response.json().catch(function () {
+            return null;
+          });
+          if (!response.ok || !data || data.success !== true || !data.nutritionJson) {
+            throw new Error((data && (data.error || data.message)) || 'Unable to estimate nutrition right now.');
           }
+
+          setNutritionStatus('nutritionAiMessage', data.message || 'Nutrition estimate ready.', false);
+          showNutritionJson(data.nutritionJson);
+        } catch (err) {
+          setNutritionStatus('nutritionAiMessage', err.message || 'Unable to estimate nutrition right now.', true);
+        } finally {
+          var maintenance = getMaintenanceEstimate(window.__lastUserBiometrics || {});
+          if (estimateBtn) estimateBtn.disabled = !maintenance.available;
+        }
+      }
+
+      async function saveNutritionEstimate() {
+        if (!currentUserId || !lastNutritionJson) return;
+
+        var isEditing = Boolean(editingNutritionMealId);
+        var editingMealId = editingNutritionMealId;
+        var saveBtn = document.getElementById('saveNutritionBtn');
+        if (saveBtn) saveBtn.disabled = true;
+        setNutritionStatus('nutritionSaveStatus', isEditing ? 'Updating nutrition day...' : 'Saving nutrition day...', false);
+
+        try {
+          if (isEditing) {
+            await updateSavedMeal(editingMealId, lastNutritionJson);
+          } else {
+            var response = await fetch('/users/' + encodeURIComponent(currentUserId) + '/meals', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'same-origin',
+              body: JSON.stringify(lastNutritionJson)
+            });
+
+            var data = await response.json().catch(function () {
+              return null;
+            });
+            if (!response.ok) {
+              throw new Error((data && data.error) || 'Unable to save nutrition day.');
+            }
+          }
+
+          resetNutritionComposer();
+          setNutritionStatus(
+            'nutritionAiMessage',
+            isEditing ? 'Updated nutrition day successfully. You can re-open it any time to tweak the food list.' : 'Saved nutrition day successfully.',
+            false
+          );
+          await refreshNutrition();
+        } catch (err) {
+          setNutritionStatus('nutritionSaveStatus', (isEditing ? 'Update failed: ' : 'Save failed: ') + err.message, true);
+          if (saveBtn) saveBtn.disabled = false;
         }
       }
 
       (function init() {
         var userId = resolveProfileUserId();
         wireNavLinks(userId);
+        hideBioForm();
+        hideNutritionForm();
+        hideNutritionJson();
+        setNutritionDateDefault();
+        updateNutritionActionLabels();
 
-        if (userId) {
-          fetchUser(userId)
-            .then(function (user) {
-              renderProfile(user);
-              return fetchGoals(userId).catch(function () {
-                return [];
-              });
-            })
-            .then(renderGoals)
-            .catch(function (err) {
-              if (err.message !== 'Unauthorized') {
-                var errorEl = document.getElementById('error');
-                errorEl.textContent = 'Could not load user: ' + err.message;
-              }
-            });
-        } else {
+        var saveBiometricsBtn = document.getElementById('saveBiometricsBtn');
+        var editBiometricsBtn = document.getElementById('editBiometricsBtn');
+        var toggleNutritionAgentBtn = document.getElementById('toggleNutritionAgentBtn');
+        var cancelNutritionBtn = document.getElementById('cancelNutritionBtn');
+        var estimateNutritionBtn = document.getElementById('estimateNutritionBtn');
+        var saveNutritionBtn = document.getElementById('saveNutritionBtn');
+        var clearNutritionPreviewBtn = document.getElementById('clearNutritionPreviewBtn');
+
+        if (saveBiometricsBtn) saveBiometricsBtn.addEventListener('click', saveBiometrics);
+        if (editBiometricsBtn) {
+          editBiometricsBtn.addEventListener('click', function () {
+            if (!currentUserId) {
+              setBioSaveStatus('No user loaded. Please log in first.', true);
+              hideBioForm();
+              return;
+            }
+            showBioForm();
+          });
+        }
+        if (toggleNutritionAgentBtn) {
+          toggleNutritionAgentBtn.addEventListener('click', function () {
+            var form = document.getElementById('nutritionForm');
+            if (form && form.style.display === 'block') {
+              hideNutritionForm();
+              return;
+            }
+            showNutritionForm();
+          });
+        }
+        if (cancelNutritionBtn) cancelNutritionBtn.addEventListener('click', resetNutritionComposer);
+        if (estimateNutritionBtn) estimateNutritionBtn.addEventListener('click', estimateNutrition);
+        if (saveNutritionBtn) saveNutritionBtn.addEventListener('click', saveNutritionEstimate);
+        if (clearNutritionPreviewBtn) clearNutritionPreviewBtn.addEventListener('click', hideNutritionJson);
+
+        if (!userId) {
           redirectToLogin();
           return;
         }
 
-        document.getElementById('saveBiometricsBtn').addEventListener('click', saveBiometrics);
-        document.getElementById('editBiometricsBtn').addEventListener('click', () => {
-          if (!currentUserId) {
-            setBioSaveStatus('No user loaded. Please log in first.', true);
-            hideBioForm();
-            return;
-          }
-          showBioForm();
-        });
-
-        hideBioForm();
+        fetchUser(userId)
+          .then(function (user) {
+            renderProfile(user);
+            return Promise.all([
+              fetchGoals(userId).catch(function () { return []; }),
+              fetchMeals(userId).catch(function () { return []; })
+            ]).then(function (results) {
+              renderGoals(results[0]);
+              renderNutrition(results[1], user && user.biometrics ? user.biometrics : null);
+            });
+          })
+          .catch(function (err) {
+            if (err.message !== 'Unauthorized') {
+              var errorEl = document.getElementById('error');
+              if (errorEl) {
+                errorEl.textContent = 'Could not load user: ' + err.message;
+              }
+            }
+          });
       })();
     </script>
   </body>
 </html>
-

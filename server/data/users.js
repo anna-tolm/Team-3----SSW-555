@@ -3,6 +3,24 @@ import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
 import helperMethods from '../helpers.js';
 
+function serializeEmbeddedDoc(doc) {
+  return { ...doc, _id: doc._id?.toString?.() || doc._id };
+}
+
+function normalizeMealLog(meal, existingMeal = {}) {
+  if (!meal || typeof meal !== 'object') throw 'Meal log must be an object';
+
+  const normalized = { ...existingMeal, ...meal };
+  normalized._id = existingMeal._id || new ObjectId();
+  normalized.mealType = helperMethods.checkString(normalized.mealType, 'mealType');
+  normalized.description = helperMethods.checkString(normalized.description, 'description');
+  normalized.date = meal.date
+    ? helperMethods.checkDate(meal.date, 'date')
+    : (existingMeal.date ? helperMethods.checkDate(existingMeal.date, 'date') : new Date().toISOString().split('T')[0]);
+
+  return normalized;
+}
+
 // USER SCHEMA
 // type User = {
 //     _id: ObjectId;
@@ -202,11 +220,7 @@ export const getProgressEntries = async (userId, options = {}) => {
 // Log a meal for a user.
 export const addMealLog = async (userId, meal) => {
   userId = helperMethods.checkId(userId, 'userId');
-  if (!meal || typeof meal !== 'object') throw 'Meal log must be an object';
-  meal.mealType = helperMethods.checkString(meal.mealType, 'mealType');
-  meal.description = helperMethods.checkString(meal.description, 'description');
-  const date = meal.date ? helperMethods.checkDate(meal.date, 'date') : new Date().toISOString().split('T')[0];
-  const mealEntry = { ...meal, date, _id: new ObjectId() };
+  const mealEntry = normalizeMealLog(meal);
 
   const usersCollection = await users();
   const result = await usersCollection.findOneAndUpdate(
@@ -216,8 +230,60 @@ export const addMealLog = async (userId, meal) => {
   );
   if (!result) throw 'User not found';
   const added = result.mealLogs[result.mealLogs.length - 1];
-  added._id = added._id.toString();
-  return added;
+  return serializeEmbeddedDoc(added);
+};
+
+// Update a saved meal log for a user.
+export const updateMealLog = async (userId, mealId, meal) => {
+  userId = helperMethods.checkId(userId, 'userId');
+  mealId = helperMethods.checkId(mealId, 'mealId');
+
+  const usersCollection = await users();
+  const user = await usersCollection.findOne(
+    { _id: new ObjectId(userId) },
+    { projection: { mealLogs: 1 } }
+  );
+  if (!user) throw 'User not found';
+
+  const existingMeal = (user.mealLogs || []).find((entry) => entry._id?.toString?.() === mealId);
+  if (!existingMeal) throw 'Meal log not found';
+
+  const nextMeal = normalizeMealLog(meal, existingMeal);
+  const result = await usersCollection.findOneAndUpdate(
+    { _id: new ObjectId(userId), 'mealLogs._id': existingMeal._id },
+    { $set: { 'mealLogs.$': nextMeal } },
+    { returnDocument: 'after', projection: { mealLogs: 1 } }
+  );
+  if (!result) throw 'Meal log not found';
+
+  const updatedMeal = (result.mealLogs || []).find((entry) => entry._id?.toString?.() === mealId);
+  if (!updatedMeal) throw 'Meal log not found';
+  return serializeEmbeddedDoc(updatedMeal);
+};
+
+// Delete a saved meal log for a user.
+export const deleteMealLog = async (userId, mealId) => {
+  userId = helperMethods.checkId(userId, 'userId');
+  mealId = helperMethods.checkId(mealId, 'mealId');
+
+  const usersCollection = await users();
+  const user = await usersCollection.findOne(
+    { _id: new ObjectId(userId) },
+    { projection: { mealLogs: 1 } }
+  );
+  if (!user) throw 'User not found';
+
+  const existingMeal = (user.mealLogs || []).find((entry) => entry._id?.toString?.() === mealId);
+  if (!existingMeal) throw 'Meal log not found';
+
+  const result = await usersCollection.findOneAndUpdate(
+    { _id: new ObjectId(userId) },
+    { $pull: { mealLogs: { _id: existingMeal._id } } },
+    { returnDocument: 'after', projection: { mealLogs: 1 } }
+  );
+  if (!result) throw 'Meal log not found';
+
+  return { deleted: true, id: mealId };
 };
 
 // Get meal logs for a user, optionally by date range.
@@ -241,7 +307,7 @@ export const getMealLogs = async (userId, options = {}) => {
       return true;
     });
   }
-  return logs.map((e) => ({ ...e, _id: e._id?.toString?.() || e._id }));
+  return logs.map(serializeEmbeddedDoc);
 };
 
 // Get all users (for admin/debug). Excludes passwords.

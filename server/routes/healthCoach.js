@@ -1,32 +1,67 @@
 import express from "express";
-import { getHealthCoachResponse, getCreateGoalResponse, runCreateGoalStream } from '../services/gemini/healthCoach.js';
+import {
+    getHealthCoachResponse,
+    getCreateGoalResponse,
+    getNutritionEstimateResponse,
+    runCreateGoalStream
+} from '../services/gemini/healthCoach.js';
 const router = express.Router();
 
 //POST for routing messages in chat to AI
 router.post('/chat', async (req, res) => {
-    const { message, userId } = req.body;
-    if(!message){
-        return res.status(400).json({error: 'Message required!'});
+    try {
+        const { message, userId } = req.body;
+        if(!message){
+            return res.status(400).json({error: 'Message required!'});
 
+        }
+        if(!userId){
+            return res.status(400).json({error: 'User id is required!'});
+        }
+        const response = await getHealthCoachResponse({ userMessage: message, userId});
+        res.json(response);
+    } catch (e) {
+        res.status(500).json({ error: e?.message ?? String(e) });
     }
-    if(!userId){
-        return res.status(400).json({error: 'User id is required!'});
-    }
-    const response = await getHealthCoachResponse({ userMessage: message, userId});
-    res.json(response);
 });
 
 // POST /api/health-coach/create-goal - generate a goal plan + Goal JSON
 router.post('/create-goal', async (req, res) => {
-    const { message, userId } = req.body;
-    if(!message){
-        return res.status(400).json({error: 'Message required!'});
+    try {
+        const { message, userId } = req.body;
+        if(!message){
+            return res.status(400).json({error: 'Message required!'});
+        }
+        if(!userId){
+            return res.status(400).json({error: 'User id is required!'});
+        }
+        const response = await getCreateGoalResponse({ userMessage: message, userId});
+        res.json(response);
+    } catch (e) {
+        res.status(500).json({ error: e?.message ?? String(e) });
     }
-    if(!userId){
-        return res.status(400).json({error: 'User id is required!'});
+});
+
+router.post('/estimate-nutrition', async (req, res) => {
+    try {
+        const { message, userId, date } = req.body;
+        if(!message){
+            return res.status(400).json({error: 'Message required!'});
+        }
+        if(!userId){
+            return res.status(400).json({error: 'User id is required!'});
+        }
+        if(!date){
+            return res.status(400).json({error: 'Date is required!'});
+        }
+        const response = await getNutritionEstimateResponse({ userMessage: message, userId, date });
+        if (!response.success && !response.nutritionJson) {
+            return res.status(400).json(response);
+        }
+        res.json(response);
+    } catch (e) {
+        res.status(400).json({ error: e?.message ?? String(e) });
     }
-    const response = await getCreateGoalResponse({ userMessage: message, userId});
-    res.json(response);
 });
 
 // POST /api/health-coach/create-goal/stream
